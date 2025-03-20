@@ -3,7 +3,7 @@ import { constantes } from "../../components/constantes";
 document.addEventListener('DOMContentLoaded', () => {
   console.log("El DOM ha sido completamente cargado")
 
-  const form = document.querySelector('.login-form')
+  const form = document.querySelector('#login-form')
   console.log("Formulario de login seleccionado:", form)
 
   if (!form) {
@@ -17,11 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const email = form.querySelector('input[type="email"]').value
     const password = form.querySelector('input[type="password"]').value
-
-    // if (!email || constantes.emailValid.test(email)) {
-    //   alert('Por favor, ingresa un correo electrónico válido.')
-    //   return
-    // }
 
     if (!password) {
       alert('Por favor, ingresa tu contraseña.')

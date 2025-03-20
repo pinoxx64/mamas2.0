@@ -10,4 +10,14 @@ class UserRol extends Model
         'usuarioId',
         'rolId'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'rolId');
+    }
 }

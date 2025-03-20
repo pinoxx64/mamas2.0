@@ -1,5 +1,5 @@
-import { constantes } from "../../components/constantes.js";
-import { register, getIfEmailExist } from "../../components/userAPI.js";
+import { constantes } from "../../components/constantes";
+import { register, getIfEmailExist } from "../../components/userApi";
 
 const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('email');
@@ -7,7 +7,7 @@ const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirmPassword');
 
 const registrarse = async () => {
-    const form = document.getElementById('register');
+    const form = document.getElementById('register-form');
 
     nameInput.addEventListener('input', () => {
         const name = nameInput.value;
@@ -55,7 +55,9 @@ const registrarse = async () => {
         const email = emailInput.value;
 
         try {
+            console.log('entra en el try')
             const emailExist = await getIfEmailExist(email);
+            console.log(emailExist)
             if (emailExist == 1) {
                 const errores = ['El correo electrónico ya está en uso'];
                 mostrarErrores(errores, emailInput);
@@ -71,14 +73,12 @@ const registrarse = async () => {
                 mostrarErrores(errores, confirmPasswordInput);
                 submitError = true;
             }
-
+            console.log(submitError)
             if (!submitError) {
                 const user = {
                     name: formData.get('name'),
                     email: formData.get('email'),
-                    password: password,
-                    score: 0,
-                    active: 1
+                    password: password
                 };
                 console.log(user)
                 await register(user);

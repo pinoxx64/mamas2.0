@@ -38,7 +38,7 @@ class AuthController extends Controller
             $input['active'] = 1;
 
             $user = User::create($input);
-            $user->remember_token = $user->createToken('LaravelSanctumAuth', ['alumno'])->plainTextToken;
+            $user->remember_token = $user->createToken('LaravelSanctumAuth', ['Alumno'])->plainTextToken;
 
             DB::table('UserRol')->insert([
                 'usuarioId' => $user->id,
