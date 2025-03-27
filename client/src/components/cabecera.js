@@ -15,8 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               <!-- Cabecera -->
               <header class="header p-3 d-flex align-items-center justify-content-between shadow" style="background-color: #00aaaa; color: white;">
                 <div class="d-flex align-items-center" id="botonesCabecera">
-                  <a class="h4 mb-0 me-3 text-white" href="../inicio/inicio.html">Escape Web</a>
-                  <button class="btn" onclick="location.href=''" style="background-color: #ff4040; color: white;">Boton de prueba</button>
+                  <a class="h4 mb-0 me-3 text-white" href="../inicio/inicio.html">Mamas 2.0</a>
                 </div>
                 
                 <div class="dropdown">
@@ -30,11 +29,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             `
       console.log(userRol.user)
       for (let i = 0; i < userRol.user.length; i++) {
-        // if (userRol.user[i].rolId == 1) {
-        //   document.getElementById("botonesCabecera").innerHTML += `
-        //     <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Administrar usuarios</button>
-        //   `
-        // }
+        if (userRol.user[i].rolId == 1) {
+          document.getElementById("botonesCabecera").innerHTML += `
+            <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Administrar usuarios</button>
+          `
+        }else if (userRol.user[i].rolId == 2) {
+          document.getElementById("botonesCabecera").innerHTML += `
+            <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Crear Preguntas</button>
+          `
+        }else if (userRol.user[i].rolId == 3) {
+          document.getElementById("botonesCabecera").innerHTML += `
+            <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Prueba</button>
+          `
+        }
       }
     } else {
       console.error("No se pudo cargar la información del usuario.");
