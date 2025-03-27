@@ -4,9 +4,11 @@ export const getUserRolByUserId = async (userId) => {
     const rutaUserRol = constantes.urlApi + constantes.userRol + 'usuario/'
 
     try {
+        const token = sessionStorage.getItem('token')
         const respuesta = await fetch(rutaUserRol + userId, {
             method: 'GET',
             headers: {
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             }
         })

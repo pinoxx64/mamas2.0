@@ -82,6 +82,22 @@ class UserController extends Controller
         return response()->json(['user' => $user], Response::HTTP_CREATED);
     }
 
+    public function putPassword(Request $request, $id){
+        $user = user::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'user no encontrado'], 404);
+        }
+
+        $datosUser = [
+            'password' => bcrypt($request['password'])
+        ];
+
+        $user->update($datosUser);
+
+        return response()->json(['user' => $user], Response::HTTP_CREATED);
+    }
+
     public function getIfEmailExist($email){
         $user = user::where('email', $email)->first();
 

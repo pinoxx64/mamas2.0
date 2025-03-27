@@ -55,9 +55,12 @@ export const getUserById = async (userId) => {
     const rutaUser = constantes.urlApi + constantes.user
 
     try {
+        const token = sessionStorage.getItem('token')
+        console.log('token', token)
         const respuesta = await fetch(rutaUser + userId, {
             method: 'GET',
             headers: {
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             }
         })

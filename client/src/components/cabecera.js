@@ -1,4 +1,4 @@
-import { getUserById, putUser } from "./userApi.js"
+import { getUserById} from "./userApi.js"
 import { getUserRolByUserId } from "./userRolApi.js"
 
 document.addEventListener("DOMContentLoaded", async () => {

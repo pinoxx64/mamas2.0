@@ -42,7 +42,7 @@ class AuthController extends Controller
 
             DB::table('UserRol')->insert([
                 'usuarioId' => $user->id,
-                'rolId' => 2,
+                'rolId' => 3,
             ]);
 
             return response()->json([
@@ -67,9 +67,9 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            $user = Auth::user();
 
-        if ($user && Hash::check($request->password, $user->password)) {
             $usuarioRoles = DB::table('userRol')
                 ->where('usuarioId', $user->id)
                 ->pluck('rolId')
@@ -93,7 +93,7 @@ class AuthController extends Controller
                 }
             }
 
-            $token = $user->createToken('access_token', $abilities)->plainTextToken;
+            $token = $user->createToken('LaravelSanctumAuth', $abilities)->plainTextToken;
 
             $success = [
                 'token' => $token,
@@ -103,7 +103,7 @@ class AuthController extends Controller
             ];
 
             return response()->json(["success" => true, "data" => $success, "message" => "¡Has iniciado sesión!"]);
-        } else {
+        }else {
             return response()->json(["success" => false, "message" => "No autorizado"], 401);
         }
     }
