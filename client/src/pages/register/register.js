@@ -82,7 +82,7 @@ const registrarse = async () => {
                 };
                 console.log(user)
                 await register(user);
-                alert('Registro exitoso');
+                window.location.href = '../login/login.html';
                 form.reset();
             }
         } catch (error) {
