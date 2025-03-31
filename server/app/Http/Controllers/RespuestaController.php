@@ -33,4 +33,20 @@ class RespuestaController extends Controller
         ]);
         return response()->json(['respuesta' => $respuesta], 201);
     }
+
+    public function putRespuesta(Request $request, $id)
+    {
+        $respuesta = Respuesta::find($id);
+
+        if (!$respuesta) {
+            return response()->json(['message' => 'respuesta no encontrada'], 404);
+        }
+
+        $respuesta->update([
+            'respuesta' => $request['respuesta'],
+            'preguntaId' => $request['preguntaId']
+        ]);
+
+        return response()->json(['respuesta' => $respuesta]);
+    }
 }
