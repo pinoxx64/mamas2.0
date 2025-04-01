@@ -13,6 +13,26 @@ class PreguntaController extends Controller
         return Response()->json(['pregunta' => $pregunta]);
     }
 
+    public function getPreguntaWithRespuesta()
+    {
+        $preguntas = Pregunta::with(['respuestas', 'asignatura'])->get();
+
+        $preguntasWithAll = $preguntas->map(function ($pregunta) {
+            return [
+                'id' => $pregunta->id,
+                'tipo' => $pregunta->tipo,
+                'pregunta' => $pregunta->pregunta,
+                'opciones' => $pregunta->opciones,
+                'asignatura' => $pregunta->asignatura ? $pregunta->asignatura->nombre : null,
+                'respuestas' => $pregunta->respuestas,
+                'created_at' => $pregunta->created_at,
+                'updated_at' => $pregunta->updated_at,
+            ];
+        });
+    
+        return response()->json(['preguntas' => $preguntasWithAll]);
+    }
+
     public function getPreguntaByAsignaturaId($id){
         $pregunta = Pregunta::where('asignaturaId', $id)->get();
 

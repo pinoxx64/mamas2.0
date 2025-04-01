@@ -15,7 +15,7 @@ class AsignaturaSeeder extends Seeder
     {
         $asignaturas = [
             [
-                'nombre' => 'DWC'
+                'nombre' => 'DWS'
             ],
             [
                 'nombre' => 'DWC'

@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             UserRolSeeder::class,
             AsignaturaSeeder::class,
+            PreguntaSeeder::class,
+            RespuestaSeeder::class
         ]);
     }
 }

@@ -52,8 +52,11 @@ Route::prefix('asignatura')->middleware('auth:sanctum')->group(function() {
 Route::prefix('pregunta')->middleware('auth:sanctum')->group(function() {
     Route::get('/', [PreguntaController::class, 'getPregunta']);
     Route::get('/asignatura/{id}', [PreguntaController::class, 'getPreguntaByAsignaturaId']);
-    Route::post('/', [PreguntaController::class, 'postPregunta'])->middleware('midProfesor');
-    Route::put('/{id}', [PreguntaController::class, 'putPregunta'])->middleware('midProfesor');
+    Route::middleware('midProfesor')->group(function() {
+        Route::post('/', [PreguntaController::class, 'postPregunta']);
+        Route::put('/{id}', [PreguntaController::class, 'putPregunta']);
+        Route::get('/preguntaWithRespuesta', [PreguntaController::class, 'getPreguntaWithRespuesta']);
+    });
 });
 
 // Respuestas
@@ -63,6 +66,7 @@ Route::prefix('respuesta')->middleware('auth:sanctum')->group(function() {
     Route::post('/', [RespuestaController::class, 'postRespuesta'])->middleware('midProfesor');
     Route::put('/{id}', [RespuestaController::class, 'putRespuesta'])->middleware('midProfesor');
 });
+
 //Auth
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
