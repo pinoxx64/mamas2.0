@@ -35,29 +35,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           `
         }else if (userRol.user[i].rolId == 2) {
           document.getElementById("botonesCabecera").innerHTML += `
-            <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Crear Preguntas</button>
+            <button class="btn" onclick="location.href='../gestionPregunta/gestionPregunta.html'" style="background-color: #ff4040; color: white;">Crear Preguntas</button>
           `
         }else if (userRol.user[i].rolId == 3) {
           document.getElementById("botonesCabecera").innerHTML += `
-            <button class="btn" onclick="location.href='../gestionUser/gestionUser.html'" style="background-color: #ff4040; color: white;">Prueba</button>
+            <button class="btn" onclick="location.href=''" style="background-color: #ff4040; color: white;">Prueba</button>
           `
         }
       }
     } else {
       console.error("No se pudo cargar la información del usuario.");
     }
-
-    // document.getElementById("header-container").addEventListener("click", (event) => {
-    //   if (event.target && event.target.id === "botonPerfil") {
-    //     if (user) {
-    //       document.getElementById("name").value = user.user.name
-    //       document.getElementById("email").value = user.user.email
-    //       const modalPerfil = new bootstrap.Modal(document.getElementById('modalPerfil'))
-    //       modalPerfil.show()
-    //     }
-    //   }
-    // })
-    // editarPerfil(user.user)
   }
 
   await cabecera()

@@ -26,39 +26,6 @@ class UserController extends Controller
         return response()->json(['user' => $user]);
     }
 
-    // public function getUserByEmail($email){
-    //     $user = user::where('email', $email)->first();
-
-    //     if (!$user) {
-    //         return response()->json(['message' => 'user don`t find'], 404);
-    //     }
-
-    //     return response()->json(['user' => $user]);
-    // }
-
-    // public function postUser(Request $request){
-    //     $validator = Validator::make($request->all(), [
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|string|email|max:255|unique:users',
-    //         'password' => 'required|string|min:5',
-    //         'foto' => 'string',
-    //         'active' => 'boolean'
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
-    //     }else{
-    //         $user = User::create([
-    //             'name' => $request['name'],
-    //             'email' => $request['email'],
-    //             'password' => bcrypt($request['password']),
-    //             'foto' => $request[null],
-    //             'active' => $request['active']
-    //         ]);
-    //         return response()->json(['user' => $user], Response::HTTP_CREATED);
-    //     }
-    // }
-
     public function putUser(Request $request, $id){
         $user = user::find($id);
 

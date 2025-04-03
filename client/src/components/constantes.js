@@ -7,6 +7,9 @@ export const constantes = {
 
     user: 'user/',
     userRol: 'userRol/',
+    pregunta: 'pregunta/',
+    respuesta: 'respuesta/',
+    asignatura: 'asignatura/',
 
     nameValid: /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/,
     emailValid: /^[\w.%+-]{2,}@[\w.-]{2,}\.\w{2,}$/,
