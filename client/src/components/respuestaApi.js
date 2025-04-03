@@ -26,7 +26,7 @@ export const putRespuesta = async (respuestaId, respuesta) => {
     }
 }
 
-export const postRespuesta = async (respuesta) => {
+export const postRespuesta = async (respuestaBody) => {
     const rutaRespuesta = constantes.urlApi + constantes.respuesta
 
     try {
@@ -37,14 +37,15 @@ export const postRespuesta = async (respuesta) => {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(respuesta)
+            body: JSON.stringify(respuestaBody)
         })
 
         if (!respuesta.ok) {
             throw new Error(`Error al crear la respuesta. Código de estado: ${respuesta.status}`)
         }
-
+        
         const nuevaRespuesta = await respuesta.json()
+        console.log(nuevaRespuesta)
         return nuevaRespuesta
     } catch (error) {
         console.error('Error en la función postrespuesta:', error.message)

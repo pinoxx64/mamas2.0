@@ -44,6 +44,7 @@ export const postPregunta = async (pregunta) => {
         }
 
         const nuevaPregunta = await respuesta.json()
+        console.log(nuevaPregunta)
         return nuevaPregunta
     } catch (error) {
         console.error('Error en la función postPregunta:', error.message)
