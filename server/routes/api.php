@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExamenController;
+use App\Http\Controllers\ExamenPreguntaController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
 use App\Http\Controllers\RolController;
@@ -65,6 +67,26 @@ Route::prefix('respuesta')->middleware('auth:sanctum')->group(function() {
     Route::get('/pregunta/{id}', [RespuestaController::class, 'getRespuestaByPreguntaId']);
     Route::post('/', [RespuestaController::class, 'postRespuesta'])->middleware('midProfesor');
     Route::put('/{id}', [RespuestaController::class, 'putRespuesta'])->middleware('midProfesor');
+});
+
+// Examenes
+Route::prefix('examen')->middleware('auth:sanctum')->group(function() {
+    Route::middleware('midProfesor')->group(function() {
+        Route::get('/', [ExamenController::class, 'getExamen']);
+        Route::get('/usuario/{id}', [ExamenController::class, 'getExamenByUsuarioId']);
+        Route::post('/', [ExamenController::class, 'postExamen']);
+        Route::put('/{id}', [ExamenController::class, 'putExamen']);
+    });
+    Route::get('/{id}', [ExamenController::class, 'getExamenById']);
+});
+
+// ExamenPreguntas
+Route::prefix('examenPregunta')->middleware('auth:sanctum')->group(function() {
+    Route::get('/', [ExamenPreguntaController::class, 'getExamenPreguntas']);
+    Route::get('/{id}', [ExamenPreguntaController::class, 'getExamenPreguntaById']);
+    Route::get('/examen/{id}', [ExamenPreguntaController::class, 'getExamenPreguntaByExamenId']);
+    Route::post('/', [ExamenPreguntaController::class, 'postExamenPregunta']);
+    Route::delete('/{id}', [ExamenPreguntaController::class, 'deleteExamenPregunta']);
 });
 
 //Auth
