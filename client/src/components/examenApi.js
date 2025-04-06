@@ -1,10 +1,10 @@
 import { constantes } from "./constantes";
 
-export const getAsignatura = async () => {
-    const rutaAsignatura = constantes.urlApi + constantes.asignatura
+export const getExamen = async () => {
+    const rutaExamen = constantes.urlApi + constantes.examen
     try {
         const token = sessionStorage.getItem('token')
-        const respuesta = await fetch(rutaAsignatura, {
+        const respuesta = await fetch(rutaExamen, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -14,14 +14,14 @@ export const getAsignatura = async () => {
         })
 
         if (!respuesta.ok) {
-            throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`)
+            throw new Error(`Error al buscar el examen. Código de estado: ${respuesta.status}`)
         }
 
         const resultado = await respuesta.json()
         console.log(resultado)
         return resultado
     } catch (error) {
-        console.error('Error en la función putuser:', error.message)
+        console.error('Error en la función getExamen:', error.message)
         throw error
     }
 }
