@@ -80,4 +80,21 @@ class ExamenController extends Controller
 
         return response()->json(['examen' => $examen], Response::HTTP_CREATED);
     }
+
+    public function activeOrDesableExamen($id){
+        $examen = Examen::find($id);
+
+        if (!$examen) {
+            return response()->json(['message' => 'examen no encontrado'], 404);
+        }
+
+        if ($examen->active) {
+            $examen->active = 0;
+        } else {
+            $examen->active = 1;
+        }
+        $examen->save();
+
+        return response()->json(['examen' => $examen], Response::HTTP_OK);
+    }
 }
