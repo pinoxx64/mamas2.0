@@ -4,6 +4,8 @@ import { getAsignatura } from "../../components/asignaturaApi";
 document.addEventListener("DOMContentLoaded", async function () {
     const asignaturas = await getAsignatura();
 
+    // Función para rellenar la tabla de examenes
+
     async function rellenarExamenes() {
         const examenes = await getExamen();
         console.log("Exámenes obtenidos:", examenes);
@@ -13,6 +15,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         examenes.examen.forEach(examen => {
             const asignatura = asignaturas.asignatura.find(asig => asig.id === examen.asignaturaId)?.nombre || "Sin asignatura";
+
+            // La tabla que se ve cuando el examen está activo
 
             if (examen.active == 1) {
                 const row = tabla.row.add([
@@ -29,6 +33,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.body.insertAdjacentHTML('beforeend', deleteExamen(examen));
                 activeOrDesableExamenUI(examen.id, 'disable');
             } else {
+
+                // La tabla que se ve cuando el usuario está desactivo
+
                 const row = tabla.row.add([
                     examen.nombre,
                     examen.fhInicio,
@@ -46,6 +53,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         });
     }
+
+    // Funcion para crear el modal para activar el examen
 
     function activeExamen(examen) {
         return `
@@ -70,6 +79,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
     }
 
+    // Funcion para crear el modal para desactivar el examen
+
     function deleteExamen(examen) {
         return `
         <div class="modal" id="deleteModal${examen.id}">
@@ -93,6 +104,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         </div>
     `;
     }
+
+    // Funcion que controla el evento de activar o desactivar el examen
 
     async function activeOrDesableExamenUI(id, estado) {
         const confirmarActiveOrDesable = document.getElementById(`confirmarActiveOrDesable${id}`);
