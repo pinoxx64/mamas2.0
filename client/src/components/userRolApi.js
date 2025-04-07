@@ -27,11 +27,11 @@ export const getUserRolByUserId = async (userId) => {
 }
 
 export const deleteUserRol = async (userId, rolId) => {
-    const rutaUsuario = constantes.urlApi + constantes.userRol
+    const rutaUserRol = constantes.urlApi + constantes.userRol
 
     try {
         const token = sessionStorage.getItem('token')
-        const respuesta = await fetch(rutaUsuario + userId + '/' + rolId, {
+        const respuesta = await fetch(rutaUserRol + userId + '/' + rolId, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -52,11 +52,11 @@ export const deleteUserRol = async (userId, rolId) => {
 }
 
 export const postUserRol = async (userRol) => {
-    const rutaUsuario = constantes.urlApi + constantes.userRol
+    const rutaUserRol = constantes.urlApi + constantes.userRol
     
     try {
         const token = sessionStorage.getItem('token')
-        const respuesta = await fetch(rutaUsuario, {
+        const respuesta = await fetch(rutaUserRol, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,

@@ -1,10 +1,10 @@
 import { constantes } from "./constantes";
 
 export const getAsignatura = async () => {
-    const rutaUser = constantes.urlApi + constantes.asignatura
+    const rutaAsignatura = constantes.urlApi + constantes.asignatura
     try {
         const token = sessionStorage.getItem('token')
-        const respuesta = await fetch(rutaUser, {
+        const respuesta = await fetch(rutaAsignatura, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token,

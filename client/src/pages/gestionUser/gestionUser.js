@@ -1,5 +1,5 @@
 import { getUsersWithUserRol, putUser } from "../../components/userApi.js"
-import { deleteUserRol, postUserRol } from "../../components/userRolApi.js"
+import { deleteUserRol, getUserRolByUserId, postUserRol } from "../../components/userRolApi.js"
 
 document.addEventListener("DOMContentLoaded", function () {
     async function rellenarUsers() {
@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const tabla = $('#Users').DataTable()
         tabla.clear().draw()
         Users.user.forEach(usu => {
+            
+            // La tabla que se ve cuando el usuario está activo
+
             if (usu.active == 1) {
                 const row = tabla.row.add([
                     usu.name,
@@ -49,6 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
             } else {
+
+                // La tabla que se ve cuando el usuario está inactivo
+
                 const row = tabla.row.add([
                     usu.name,
                     usu.email,
@@ -65,6 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
     }
+
+    // Funcion que contiene el modal de editar el usuario
 
     function editarUserModal(usu) {
         return `
@@ -106,6 +114,8 @@ document.addEventListener("DOMContentLoaded", function () {
     `
     }
 
+    // Funcion que contiene el modal de editar el rol
+
     function editarRolModal(usu) {
         return `
                 <div class="modal" id="rolModal${usu.id}">
@@ -121,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </label><br>
 
                                 <label>
-                                    <input type="checkbox" id="alum${usu.id}"> ALumno
+                                    <input type="checkbox" id="alum${usu.id}"> Alumno
                                 </label><br>
 
                                 <label>
@@ -137,6 +147,8 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             `
     }
+
+    // Funcion que contiene el modal de desactivar el usuario
 
     function deleteUserModal(usu) {
         return `
@@ -163,6 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
     `
     }
 
+    // Funcion que contiene el modal de activar el usuario
+
     function anadirUserModal(usu) {
         return `
             <div class="modal" id="activeModal${usu.id}">
@@ -185,6 +199,8 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>       
         `
     }
+
+    // Funcion que controla el evento de editar el usuario
 
     async function editarUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
@@ -218,6 +234,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Funcion que controla el evento de desactivar el usuario
+
     async function eliminarUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
         const confirmarEliminacion = document.getElementById(`confirmarEliminacion${id}`)
@@ -247,6 +265,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Funcion que controla el evento de activar el usuario
+
     async function anadirUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
         const confirmarEliminacion = document.getElementById(`confirmarActivacion${id}`)
@@ -275,6 +295,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Funcion que controla el evento de editar el rol
+
     async function editarRolesUI(userWithUserRols, id) {
         const userRol = userWithUserRols.userRol.filter(u => u.usuarioId == id);
         const modificarRolBtn = document.getElementById(`editarRolBtn${id}`)
@@ -289,7 +311,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     const checkedAlumno = document.getElementById(`alum${id}`)
                     const checkedAdmin = document.getElementById(`admin${id}`)
 
-                    console.log(userRol.find((rol) => rol.rolId == 1))
                     if (userRol.find((rol) => rol.rolId == 1) && checkedAdmin.checked == false) {
                         //decir de eliminar rol admin
                         await deleteUserRol(id, 1)
@@ -319,6 +340,26 @@ document.addEventListener("DOMContentLoaded", function () {
                         await deleteUserRol(id, 3)
                     } else if (userRol.find((rol) => rol.rolId == 3) == undefined && checkedAlumno.checked == true) {
                         //decir de añadir rol alumno
+                        const rolObjeto = {
+                            usuarioId: id,
+                            rolId: 3
+                        }
+                        await postUserRol(rolObjeto)
+                    }
+
+                    const userRolActualizado = await getUserRolByUserId(id)
+                    
+                    // si el usuairio tiene el rol de alumon no puede tener ni el de admin ni el de profesor
+
+                    if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 2)) {
+                        await deleteUserRol(id, 2)
+                    }else if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 1)) {
+                        await deleteUserRol(id, 1)
+                    }
+
+                    // si el usuario no tiene rol se le podrá el de alumno por defecto
+
+                    if (userRolActualizado.user.length == 0) {
                         const rolObjeto = {
                             usuarioId: id,
                             rolId: 3

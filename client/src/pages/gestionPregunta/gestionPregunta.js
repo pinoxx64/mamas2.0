@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const asignaturas = await getAsignatura()
 
     // Cargar asignaturas en el select del modal
+
     const asignaturaSelect = document.getElementById("asignatura")
     asignaturas.asignatura.forEach(asignatura => {
         const option = document.createElement("option")
@@ -29,7 +30,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     })
 
-    // Agregar nuevas opciones dinámicamente
     const agregarOpcionBtn = document.getElementById("agregarOpcion")
     const opcionesCampos = document.getElementById("opcionesCampos")
     agregarOpcionBtn.addEventListener("click", function () {
@@ -41,12 +41,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
         `
         opcionesCampos.appendChild(opcionDiv)
-
-        // Agregar funcionalidad para eliminar opciones
         opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
             opcionDiv.remove()
         })
     })
+
+    //Función para crear una nueva pregunta
 
     async function crearPreguntaUI() {
         const guardarPreguntaBtn = document.getElementById("guardarPregunta");
@@ -68,30 +68,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
                         return { texto, seleccionado };
                     });
-
-                    // Filtrar las opciones seleccionadas
                     const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
-
                     if (opcionesSeleccionadas.length === 1) {
-                        // Si solo hay un checkbox en true, es "opciones individuales"
-                        respuesta = opcionesSeleccionadas[0].texto.charAt(0); // Primera letra de la opción
-                        opciones = opciones.map(opcion => opcion.texto); // Guardar solo los textos
+                        respuesta = opcionesSeleccionadas[0].texto.charAt(0);
+                        opciones = opciones.map(opcion => opcion.texto);
                         tipoPregunta = "opciones individuales";
                     } else if (opcionesSeleccionadas.length > 1) {
-                        // Si hay varios checkboxes en true, es "opciones múltiples"
-                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", "); // Letras de las opciones seleccionadas
-                        opciones = opciones.map(opcion => opcion.texto); // Guardar solo los textos
+                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", ");
+                        opciones = opciones.map(opcion => opcion.texto);
                         tipoPregunta = "opciones multiples";
                     } else {
                         alert("Debe seleccionar al menos una opción como respuesta.");
                         return;
                     }
                 } else {
-                    // Si no es "opciones", se toma el valor del campo de respuesta
                     respuesta = document.getElementById("respuesta").value;
                 }
 
-                // Crear el objeto de la nueva pregunta
                 const nuevaPregunta = {
                     tipo: tipoPregunta,
                     pregunta: pregunta,
@@ -100,13 +93,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 };
 
                 console.log("Nueva Pregunta:", nuevaPregunta);
-
-                // Enviar la nueva pregunta al servidor
                 const preguntaCreada = await postPregunta(nuevaPregunta);
-                //La id es lo que no funciona :(
-                
 
-                // Si es de tipo opciones, guardar las respuestas
                 if (tipoPregunta === "opciones individuales" || tipoPregunta === "opciones multiples") {
                     const respuestas = respuesta.split(", ");
                     respuestas.forEach(async (res) => {
@@ -127,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
 
                 alert("Pregunta creada exitosamente.");
-                //location.reload()
+                location.reload()
             } catch (error) {
                 console.error("Error al crear la pregunta:", error);
             }
@@ -135,6 +123,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Función para rellenar la tabla de preguntas
+
     async function rellenarPreguntas() {
         const preguntasWithRespuestas = await getPreguntasWithRespuestas()
         console.log(preguntasWithRespuestas.preguntas)
@@ -170,6 +159,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             row.nodes().to$().data('Preguntas', pre)
         })
     }
+
+    // Funcion para crear el modal para editar la pregunta
 
     function editarPreguntaModal(pre, asignaturas) {
         const asignaturaOptions = asignaturas.asignatura.map(asignatura => {
@@ -236,6 +227,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         `
     }
 
+    // Funcion que controla el evento de editar la pregunta
+
     async function editarPreguntaUI(pre) {
         const modificarBtn = document.getElementById(`guardarBtn${pre.id}`);
     
@@ -255,7 +248,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         opciones = null;
                     }
     
-                    // Crear el objeto de la pregunta actualizada
                     const preguntaCambiada = {
                         tipo: tipo,
                         pregunta: pregunta,
@@ -265,11 +257,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                     console.log("Pregunta actualizada:", preguntaCambiada);
                     await putPregunta(pre.id, preguntaCambiada);
     
-                    // Manejar las respuestas
                     if (tipo === 'opciones multiples' || tipo === 'opciones individuales') {
                         const respuestas = respuestaInput.split(',').map(res => res.trim());
     
-                        // Actualizar las respuestas existentes
                         for (let i = 0; i < pre.respuestas.length; i++) {
                             const respuestaExistente = pre.respuestas[i];
                             if (respuestas[i]) {
@@ -280,13 +270,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 console.log("Respuesta actualizada:", respuestaCambiada);
                                 await putRespuesta(respuestaExistente.id, respuestaCambiada);
                             } else {
-                                // Si no hay una respuesta correspondiente, eliminarla
                                 console.log("Eliminando respuesta:", respuestaExistente.id);
                                 await deleteRespuesta(respuestaExistente.id);
                             }
                         }
     
-                        // Agregar nuevas respuestas si hay más respuestas que las existentes
                         for (let i = pre.respuestas.length; i < respuestas.length; i++) {
                             const nuevaRespuesta = {
                                 respuesta: respuestas[i],
@@ -296,7 +284,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                             await postRespuesta(nuevaRespuesta);
                         }
                     } else {
-                        // Si no es de tipo opciones, actualizar o crear una única respuesta
                         if (pre.respuestas.length > 0) {
                             const respuestaCambiada = {
                                 respuesta: respuestaInput,
@@ -314,7 +301,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         }
                     }
     
-                    // Cerrar el modal y recargar la página
                     const modal = new bootstrap.Modal(modalElement);
                     modal.hide();
                     location.reload();
