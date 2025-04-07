@@ -49,40 +49,40 @@ document.addEventListener("DOMContentLoaded", async function () {
     //Función para crear una nueva pregunta
 
     async function crearPreguntaUI() {
-        const guardarPreguntaBtn = document.getElementById("guardarPregunta");
+        const guardarPreguntaBtn = document.getElementById("guardarPregunta")
 
         guardarPreguntaBtn.addEventListener("click", async () => {
             try {
-                const tipo = tipoPreguntaSelect.value;
-                const pregunta = document.getElementById("pregunta").value;
-                const asignaturaId = asignaturaSelect.value;
+                const tipo = tipoPreguntaSelect.value
+                const pregunta = document.getElementById("pregunta").value
+                const asignaturaId = asignaturaSelect.value
 
-                let opciones = [];
-                let respuesta = null;
-                let tipoPregunta = tipo;
+                let opciones = []
+                let respuesta = null
+                let tipoPregunta = tipo
 
                 if (tipo === "opciones") {
-                    const opcionesInputs = opcionesCampos.querySelectorAll(".input-group");
+                    const opcionesInputs = opcionesCampos.querySelectorAll(".input-group")
                     opciones = Array.from(opcionesInputs).map(opcionDiv => {
-                        const texto = opcionDiv.querySelector("input[type='text']").value;
-                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
-                        return { texto, seleccionado };
-                    });
-                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
+                        const texto = opcionDiv.querySelector("input[type='text']").value
+                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked
+                        return { texto, seleccionado }
+                    })
+                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado)
                     if (opcionesSeleccionadas.length === 1) {
-                        respuesta = opcionesSeleccionadas[0].texto.charAt(0);
-                        opciones = opciones.map(opcion => opcion.texto);
-                        tipoPregunta = "opciones individuales";
+                        respuesta = opcionesSeleccionadas[0].texto.charAt(0)
+                        opciones = opciones.map(opcion => opcion.texto)
+                        tipoPregunta = "opciones individuales"
                     } else if (opcionesSeleccionadas.length > 1) {
-                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", ");
-                        opciones = opciones.map(opcion => opcion.texto);
-                        tipoPregunta = "opciones multiples";
+                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", ")
+                        opciones = opciones.map(opcion => opcion.texto)
+                        tipoPregunta = "opciones multiples"
                     } else {
-                        alert("Debe seleccionar al menos una opción como respuesta.");
-                        return;
+                        alert("Debe seleccionar al menos una opción como respuesta.")
+                        return
                     }
                 } else {
-                    respuesta = document.getElementById("respuesta").value;
+                    respuesta = document.getElementById("respuesta").value
                 }
 
                 const nuevaPregunta = {
@@ -90,36 +90,36 @@ document.addEventListener("DOMContentLoaded", async function () {
                     pregunta: pregunta,
                     asignaturaId: asignaturaId,
                     opciones: opciones.length > 0 ? opciones.join("\n") : null,
-                };
+                }
 
-                console.log("Nueva Pregunta:", nuevaPregunta);
-                const preguntaCreada = await postPregunta(nuevaPregunta);
+                console.log("Nueva Pregunta:", nuevaPregunta)
+                const preguntaCreada = await postPregunta(nuevaPregunta)
 
                 if (tipoPregunta === "opciones individuales" || tipoPregunta === "opciones multiples") {
-                    const respuestas = respuesta.split(", ");
+                    const respuestas = respuesta.split(", ")
                     respuestas.forEach(async (res) => {
                         const nuevaRespuesta = {
                             respuesta: res.trim(),
                             preguntaId: preguntaCreada.pregunta.id
-                        };
-                        console.log("Nueva Respuesta:", nuevaRespuesta);
-                        await postRespuesta(nuevaRespuesta);
-                    });
+                        }
+                        console.log("Nueva Respuesta:", nuevaRespuesta)
+                        await postRespuesta(nuevaRespuesta)
+                    })
                 }else{
                     const nuevaRespuesta = {
                         respuesta: respuesta,
                         preguntaId: preguntaCreada.pregunta.id
-                    };
-                    console.log("Nueva Respuesta:", nuevaRespuesta);
-                    await postRespuesta(nuevaRespuesta);
+                    }
+                    console.log("Nueva Respuesta:", nuevaRespuesta)
+                    await postRespuesta(nuevaRespuesta)
                 }
 
-                alert("Pregunta creada exitosamente.");
+                alert("Pregunta creada exitosamente.")
                 location.reload()
             } catch (error) {
-                console.error("Error al crear la pregunta:", error);
+                console.error("Error al crear la pregunta:", error)
             }
-        });
+        })
     }
 
     // Función para rellenar la tabla de preguntas
@@ -230,22 +230,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Funcion que controla el evento de editar la pregunta
 
     async function editarPreguntaUI(pre) {
-        const modificarBtn = document.getElementById(`guardarBtn${pre.id}`);
+        const modificarBtn = document.getElementById(`guardarBtn${pre.id}`)
     
         if (modificarBtn) {
             modificarBtn.addEventListener('click', async () => {
                 try {
-                    const modalElement = document.getElementById(`myModal${pre.id}`);
-                    const tipo = document.getElementById(`tipo${pre.id}`).value;
-                    const pregunta = document.getElementById(`pregunta${pre.id}`).value;
-                    const asignaturaId = document.getElementById(`asignatura${pre.id}`).value;
-                    const respuestaInput = document.getElementById(`respuesta${pre.id}`).value;
-                    let opciones = document.getElementById(`opciones${pre.id}`).value;
+                    const modalElement = document.getElementById(`myModal${pre.id}`)
+                    const tipo = document.getElementById(`tipo${pre.id}`).value
+                    const pregunta = document.getElementById(`pregunta${pre.id}`).value
+                    const asignaturaId = document.getElementById(`asignatura${pre.id}`).value
+                    const respuestaInput = document.getElementById(`respuesta${pre.id}`).value
+                    let opciones = document.getElementById(`opciones${pre.id}`).value
     
-                    console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones);
+                    console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones)
     
                     if (tipo === 'texto' || tipo === 'números') {
-                        opciones = null;
+                        opciones = null
                     }
     
                     const preguntaCambiada = {
@@ -253,25 +253,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                         pregunta: pregunta,
                         asignaturaId: asignaturaId,
                         opciones: opciones,
-                    };
-                    console.log("Pregunta actualizada:", preguntaCambiada);
-                    await putPregunta(pre.id, preguntaCambiada);
+                    }
+                    console.log("Pregunta actualizada:", preguntaCambiada)
+                    await putPregunta(pre.id, preguntaCambiada)
     
                     if (tipo === 'opciones multiples' || tipo === 'opciones individuales') {
-                        const respuestas = respuestaInput.split(',').map(res => res.trim());
+                        const respuestas = respuestaInput.split(',').map(res => res.trim())
     
                         for (let i = 0; i < pre.respuestas.length; i++) {
-                            const respuestaExistente = pre.respuestas[i];
+                            const respuestaExistente = pre.respuestas[i]
                             if (respuestas[i]) {
                                 const respuestaCambiada = {
                                     respuesta: respuestas[i],
                                     preguntaId: pre.id,
-                                };
-                                console.log("Respuesta actualizada:", respuestaCambiada);
-                                await putRespuesta(respuestaExistente.id, respuestaCambiada);
+                                }
+                                console.log("Respuesta actualizada:", respuestaCambiada)
+                                await putRespuesta(respuestaExistente.id, respuestaCambiada)
                             } else {
-                                console.log("Eliminando respuesta:", respuestaExistente.id);
-                                await deleteRespuesta(respuestaExistente.id);
+                                console.log("Eliminando respuesta:", respuestaExistente.id)
+                                await deleteRespuesta(respuestaExistente.id)
                             }
                         }
     
@@ -279,35 +279,35 @@ document.addEventListener("DOMContentLoaded", async function () {
                             const nuevaRespuesta = {
                                 respuesta: respuestas[i],
                                 preguntaId: pre.id,
-                            };
-                            console.log("Nueva respuesta:", nuevaRespuesta);
-                            await postRespuesta(nuevaRespuesta);
+                            }
+                            console.log("Nueva respuesta:", nuevaRespuesta)
+                            await postRespuesta(nuevaRespuesta)
                         }
                     } else {
                         if (pre.respuestas.length > 0) {
                             const respuestaCambiada = {
                                 respuesta: respuestaInput,
                                 preguntaId: pre.id,
-                            };
-                            console.log("Respuesta actualizada:", respuestaCambiada);
-                            await putRespuesta(pre.respuestas[0].id, respuestaCambiada);
+                            }
+                            console.log("Respuesta actualizada:", respuestaCambiada)
+                            await putRespuesta(pre.respuestas[0].id, respuestaCambiada)
                         } else {
                             const nuevaRespuesta = {
                                 respuesta: respuestaInput,
                                 preguntaId: pre.id,
-                            };
-                            console.log("Nueva respuesta:", nuevaRespuesta);
-                            await postRespuesta(nuevaRespuesta);
+                            }
+                            console.log("Nueva respuesta:", nuevaRespuesta)
+                            await postRespuesta(nuevaRespuesta)
                         }
                     }
     
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.hide();
-                    location.reload();
+                    const modal = new bootstrap.Modal(modalElement)
+                    modal.hide()
+                    location.reload()
                 } catch (error) {
-                    console.error('Error al confirmar la modificación:', error);
+                    console.error('Error al confirmar la modificación:', error)
                 }
-            });
+            })
         }
     }
 
