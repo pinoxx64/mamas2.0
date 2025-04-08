@@ -48,7 +48,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <!-- Tipo de Pregunta -->
                         <div class="col-12 mb-3">
                             <label for="tipoPregunta" class="form-label">Tipo de Pregunta</label>
                             <select id="tipoPregunta" class="form-select">
@@ -57,14 +56,12 @@
                                 <option value="opciones">Opciones</option>
                             </select>
                         </div>
-    
-                        <!-- Pregunta -->
+
                         <div class="col-12 mb-3">
                             <label for="pregunta" class="form-label">Pregunta</label>
                             <input type="text" id="pregunta" class="form-control" placeholder="Escribe la pregunta">
                         </div>
     
-                        <!-- Opciones (se muestra solo si el tipo es "opciones") -->
                         <div id="opcionesContainer" class="col-12 mb-3 d-none">
                             <label class="form-label">Opciones</label>
                             <div id="opcionesCampos">
@@ -76,15 +73,12 @@
                             <button type="button" id="agregarOpcion" class="btn btn-secondary btn-sm mt-2">+ Opciones</button>
                         </div>
     
-                        <!-- Asignatura -->
                         <div class="col-12 mb-3">
                             <label for="asignatura" class="form-label">Asignatura</label>
                             <select id="asignatura" class="form-select">
-                                <!-- Opciones dinámicas cargadas desde JavaScript -->
                             </select>
                         </div>
     
-                        <!-- Respuesta -->
                         <div class="col-12 mb-3">
                             <label for="respuesta" class="form-label">Respuesta</label>
                             <input type="text" id="respuesta" class="form-control" placeholder="Escribe la respuesta">

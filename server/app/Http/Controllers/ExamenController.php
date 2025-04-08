@@ -11,8 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 class ExamenController extends Controller
 {
     public function getExamen(){
-        $examen = Examen::all();
-        return Response()->json(['examen' => $examen]);
+        $examenes = Examen::with(['preguntas.respuestas', 'asignatura'])->get();
+
+        return response()->json(['examenes' => $examenes]);
     }
 
     public function getExamenById($id){
