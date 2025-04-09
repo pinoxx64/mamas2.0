@@ -1,17 +1,16 @@
-// Tienes que seguir retocando el crear examen (creo que se me está yendo de compejidad el modal, para el proximo dia apuntate de que se cree el examen sin preguntas y que en la tabla salgan las preguntas para crearlas)
-
-import { getExamen, activeOrDesableExamen} from "../../components/examenApi"
-import { getAsignatura } from "../../components/asignaturaApi"
-import { getPreguntasWithRespuestas } from "../../components/preguntaApi"
+import { getExamen } from "../../components/examenApi"; //postExamen
+import { getAsignatura } from "../../components/asignaturaApi";
+import { getPreguntasWithRespuestas, postPregunta } from "../../components/preguntaApi";
+//import { postExamenPregunta } from "../../components/examenPreguntaApi";
 
 document.addEventListener("DOMContentLoaded", async function () {
+
     const asignaturas = await getAsignatura();
     const preguntas = await getPreguntasWithRespuestas();
 
-    // Lista global para almacenar las preguntas seleccionadas y creadas
-    const preguntasSeleccionadas = [];
+    const preguntasExamen = []; // Lista de preguntas añadidas o importadas
 
-    // Cargar asignaturas en el select del modal
+    // Cargar asignaturas en el select
     const asignaturaSelect = document.getElementById("asignaturaExamen");
     asignaturas.asignatura.forEach(asignatura => {
         const option = document.createElement("option");
@@ -20,64 +19,121 @@ document.addEventListener("DOMContentLoaded", async function () {
         asignaturaSelect.appendChild(option);
     });
 
-    // Cargar preguntas en el select de importar preguntas
-    const importarPreguntasSelect = document.getElementById("importarPreguntasSelect");
-    preguntas.preguntas.forEach(pregunta => {
-        const option = document.createElement("option");
-        option.value = pregunta.id;
-        option.textContent = `${pregunta.tipo}: ${pregunta.pregunta}`;
-        importarPreguntasSelect.appendChild(option);
+    // Mostrar el modal de crear pregunta al hacer clic en "Añadir Pregunta"
+    const mostrarCrearPreguntaBtn = document.getElementById("mostrarCrearPregunta");
+    mostrarCrearPreguntaBtn.addEventListener("click", () => {
+        const crearPreguntaModal = new bootstrap.Modal(document.getElementById("crearPreguntaModal"));
+        crearPreguntaModal.show();
     });
 
-    // Mostrar/ocultar el select de importar preguntas
-    const importarPreguntasBtn = document.getElementById("importarPreguntasBtn");
-    const importarPreguntasContainer = document.getElementById("importarPreguntasContainer");
-    importarPreguntasBtn.addEventListener("click", () => {
-        importarPreguntasContainer.classList.toggle("d-none");
-    });
+    // Mostrar/ocultar campos según el tipo de pregunta
+    const tipoPreguntaSelect = document.getElementById("tipoPregunta");
+    const opcionesContainer = document.getElementById("opcionesContainer");
+    const respuestaContainer = document.getElementById("respuesta").parentElement;
 
-    // Agregar preguntas seleccionadas al hacer clic en el select
-    importarPreguntasSelect.addEventListener("change", () => {
-        const seleccionadas = Array.from(importarPreguntasSelect.selectedOptions).map(option => option.value);
-        seleccionadas.forEach(id => {
-            if (!preguntasSeleccionadas.includes(id)) {
-                preguntasSeleccionadas.push(id);
-            }
-        });
-        console.log("Preguntas seleccionadas:", preguntasSeleccionadas);
-    });
-
-    // Guardar una nueva pregunta creada desde el modal "Añadir Pregunta"
-    const guardarPreguntaBtn = document.getElementById("guardarPregunta");
-    guardarPreguntaBtn.addEventListener("click", async () => {
-        try {
-            const tipo = document.getElementById("tipoPregunta").value;
-            const pregunta = document.getElementById("pregunta").value;
-            const asignaturaId = document.getElementById("asignatura").value;
-
-            let opciones = [];
-            if (tipo === "opciones") {
-                const opcionesInputs = document.querySelectorAll("#opcionesCampos .form-control");
-                opciones = Array.from(opcionesInputs).map(input => input.value);
-            }
-
-            const nuevaPregunta = {
-                tipo,
-                pregunta,
-                asignaturaId,
-                opciones: opciones.length > 0 ? opciones.join("\n") : null,
-            };
-
-            const respuesta = await postPregunta(nuevaPregunta);
-            preguntasSeleccionadas.push(respuesta.pregunta.id); // Agregar la nueva pregunta a la lista
-            console.log("Pregunta creada y añadida:", respuesta.pregunta);
-            alert("Pregunta creada y añadida al examen.");
-        } catch (error) {
-            console.error("Error al crear la pregunta:", error);
+    tipoPreguntaSelect.addEventListener("change", function () {
+        if (this.value === "opciones") {
+            opcionesContainer.classList.remove("d-none");
+            respuestaContainer.classList.add("d-none");
+        } else {
+            opcionesContainer.classList.add("d-none");
+            respuestaContainer.classList.remove("d-none");
         }
     });
 
-    // Guardar el examen
+    // Agregar opciones dinámicamente
+    const agregarOpcionBtn = document.getElementById("agregarOpcion");
+    const opcionesCampos = document.getElementById("opcionesCampos");
+    agregarOpcionBtn.addEventListener("click", function () {
+        const opcionDiv = document.createElement("div");
+        opcionDiv.classList.add("input-group", "mb-2");
+        opcionDiv.innerHTML = `
+            <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
+            <input type="text" class="form-control" placeholder="Escribe una opción">
+            <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
+        `;
+        opcionesCampos.appendChild(opcionDiv);
+        opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
+            opcionDiv.remove();
+        });
+    });
+
+    // Guardar nueva pregunta desde el modal de creación
+    const guardarPreguntaBtn = document.getElementById("guardarPregunta");
+    guardarPreguntaBtn.addEventListener("click", async () => {
+        const tipo = document.getElementById("tipoPregunta").value;
+        const pregunta = document.getElementById("pregunta").value;
+        const asignaturaId = asignaturaSelect.value;
+
+        let opciones = [];
+        if (tipo === "opciones") {
+            const opcionesInputs = document.querySelectorAll("#opcionesCampos .form-control");
+            opciones = Array.from(opcionesInputs).map(input => input.value);
+        }
+
+        const nuevaPregunta = {
+            tipo,
+            pregunta,
+            asignaturaId,
+            opciones: opciones.length > 0 ? opciones.join("\n") : null,
+        };
+
+        const respuesta = await postPregunta(nuevaPregunta);
+        preguntasExamen.push(respuesta.pregunta.id);
+
+        document.getElementById("preguntasExamen").innerHTML += `
+            <li class="list-group-item">
+                <strong>${tipo}:</strong> ${pregunta}
+                ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
+            </li>
+        `;
+
+        const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"));
+        crearPreguntaModal.hide();
+    });
+
+    // Mostrar contenedor para importar preguntas
+    const mostrarImportarPreguntasBtn = document.getElementById("mostrarImportarPreguntas");
+    const importarPreguntasContainer = document.getElementById("importarPreguntasContainer");
+    const listaPreguntas = document.getElementById("listaPreguntas");
+    mostrarImportarPreguntasBtn.addEventListener("click", () => {
+        importarPreguntasContainer.classList.toggle("d-none");
+        listaPreguntas.innerHTML = ""; // Limpiar lista
+        preguntas.preguntas.forEach(pregunta => {
+            const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No tiene opciones';
+            const li = document.createElement("li");
+            li.classList.add("list-group-item");
+            li.innerHTML = `
+                <strong>${pregunta.tipo}:</strong> ${pregunta.pregunta}
+                ${opciones ? `<p><strong>Opciones:</strong> ${opciones}</p>` : ""}
+                <button class="btn btn-sm btn-primary seleccionarPregunta" data-id="${pregunta.id}">Seleccionar</button>
+            `;
+            listaPreguntas.appendChild(li);
+        });
+    });
+
+    // Seleccionar pregunta para importar
+    listaPreguntas.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("seleccionarPregunta")) {
+            const preguntaId = e.target.getAttribute("data-id");
+            const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId);
+
+            if (preguntaSeleccionada) {
+                preguntasExamen.push(preguntaSeleccionada.id);
+
+                document.getElementById("preguntasExamen").innerHTML += `
+                    <li class="list-group-item">
+                        <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
+                        ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
+                    </li>
+                `;
+
+                importarPreguntasContainer.classList.add("d-none");
+            }
+        }
+    });
+
+    // Guardar examen
     const guardarExamenBtn = document.getElementById("guardarExamenBtn");
     guardarExamenBtn.addEventListener("click", async () => {
         try {
@@ -91,13 +147,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                 fhInicio,
                 fhFinal,
                 asignaturaId,
-                preguntas: preguntasSeleccionadas, // Usar la lista global de preguntas
+                active: 0,
             };
 
-            console.log("Nuevo Examen:", nuevoExamen);
+            const examenCreado = await postExamen(nuevoExamen);
 
-            // Aquí puedes enviar el examen al servidor
-            // await postExamen(nuevoExamen);
+            // Asociar preguntas al examen
+            for (const preguntaId of preguntasExamen) {
+                await postExamenPregunta({
+                    examenId: examenCreado.examen.id,
+                    preguntaId: preguntaId,
+                });
+            }
 
             alert("Examen creado exitosamente.");
             location.reload();
@@ -105,6 +166,135 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.error("Error al guardar el examen:", error);
         }
     });
+    // const asignaturas = await getAsignatura();
+    // const preguntas = await getPreguntasWithRespuestas();
+
+    // const preguntasExamen = []; // Lista de preguntas añadidas o importadas
+
+    // // Cargar asignaturas en el select
+    // const asignaturaSelect = document.getElementById("asignaturaExamen");
+    // asignaturas.asignatura.forEach(asignatura => {
+    //     const option = document.createElement("option");
+    //     option.value = asignatura.id;
+    //     option.textContent = asignatura.nombre;
+    //     asignaturaSelect.appendChild(option);
+    // });
+
+    // // Mostrar el modal de crear pregunta al hacer clic en "Añadir Pregunta"
+    // const mostrarCrearPreguntaBtn = document.getElementById("mostrarCrearPregunta");
+    // mostrarCrearPreguntaBtn.addEventListener("click", () => {
+    //     const crearPreguntaModal = new bootstrap.Modal(document.getElementById("crearPreguntaModal"));
+    //     crearPreguntaModal.show();
+    // });
+
+    // // Guardar nueva pregunta desde el modal de creación
+    // const guardarPreguntaBtn = document.getElementById("guardarPregunta");
+    // guardarPreguntaBtn.addEventListener("click", async () => {
+    //     const tipo = document.getElementById("tipoPregunta").value;
+    //     const pregunta = document.getElementById("pregunta").value;
+    //     const asignaturaId = asignaturaSelect.value;
+
+    //     let opciones = [];
+    //     if (tipo === "opciones") {
+    //         const opcionesInputs = document.querySelectorAll("#opcionesCampos .form-control");
+    //         opciones = Array.from(opcionesInputs).map(input => input.value);
+    //     }
+
+    //     const nuevaPregunta = {
+    //         tipo,
+    //         pregunta,
+    //         asignaturaId,
+    //         opciones: opciones.length > 0 ? opciones.join("\n") : null,
+    //     };
+
+    //     const respuesta = await postPregunta(nuevaPregunta);
+    //     preguntasExamen.push(respuesta.pregunta.id);
+
+    //     document.getElementById("preguntasExamen").innerHTML += `
+    //         <li class="list-group-item">
+    //             <strong>${tipo}:</strong> ${pregunta}
+    //             ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
+    //         </li>
+    //     `;
+
+    //     const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"));
+    //     crearPreguntaModal.hide();
+    // });
+
+    // // Mostrar contenedor para importar preguntas
+    // const mostrarImportarPreguntasBtn = document.getElementById("mostrarImportarPreguntas");
+    // const importarPreguntasContainer = document.getElementById("importarPreguntasContainer");
+    // const listaPreguntas = document.getElementById("listaPreguntas");
+    // mostrarImportarPreguntasBtn.addEventListener("click", () => {
+    //     importarPreguntasContainer.classList.toggle("d-none");
+    //     listaPreguntas.innerHTML = ""; // Limpiar lista
+    //     preguntas.preguntas.forEach(pregunta => {
+    //         const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No tiene opciones';
+    //         const li = document.createElement("li");
+    //         li.classList.add("list-group-item");
+    //         li.innerHTML = `
+    //             <strong>${pregunta.tipo}:</strong> ${pregunta.pregunta}
+    //             ${opciones ? `<p><strong>Opciones:</strong> ${opciones}</p>` : ""}
+    //             <button class="btn btn-sm btn-primary seleccionarPregunta" data-id="${pregunta.id}">Seleccionar</button>
+    //         `;
+    //         listaPreguntas.appendChild(li);
+    //     });
+    // });
+
+    // // Seleccionar pregunta para importar
+    // listaPreguntas.addEventListener("click", async (e) => {
+    //     if (e.target.classList.contains("seleccionarPregunta")) {
+    //         const preguntaId = e.target.getAttribute("data-id");
+    //         const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId);
+
+    //         if (preguntaSeleccionada) {
+    //             preguntasExamen.push(preguntaSeleccionada.id);
+
+    //             document.getElementById("preguntasExamen").innerHTML += `
+    //                 <li class="list-group-item">
+    //                     <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
+    //                     ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
+    //                 </li>
+    //             `;
+
+    //             importarPreguntasContainer.classList.add("d-none");
+    //         }
+    //     }
+    // });
+
+    // // Guardar examen
+    // const guardarExamenBtn = document.getElementById("guardarExamenBtn");
+    // guardarExamenBtn.addEventListener("click", async () => {
+    //     try {
+    //         const nombre = document.getElementById("nombreExamen").value;
+    //         const fhInicio = document.getElementById("fechaInicio").value;
+    //         const fhFinal = document.getElementById("fechaFin").value;
+    //         const asignaturaId = document.getElementById("asignaturaExamen").value;
+
+    //         const nuevoExamen = {
+    //             nombre,
+    //             fhInicio,
+    //             fhFinal,
+    //             asignaturaId,
+    //             active: 0,
+    //         };
+
+    //         const examenCreado = await postExamen(nuevoExamen);
+
+    //         // Asociar preguntas al examen
+    //         for (const preguntaId of preguntasExamen) {
+    //             await postExamenPregunta({
+    //                 examenId: examenCreado.examen.id,
+    //                 preguntaId: preguntaId,
+    //             });
+    //         }
+
+    //         alert("Examen creado exitosamente.");
+    //         location.reload();
+    //     } catch (error) {
+    //         console.error("Error al guardar el examen:", error);
+    //     }
+    // });
 
     // Función para rellenar la tabla de examenes
 
@@ -223,7 +413,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <p><strong>Opciones:</strong> ${opciones}</p>
                 `
             }
-    
+
             return `
                 <li class="list-group-item">
                     <strong>${pregunta.tipo}:</strong> ${pregunta.pregunta}
@@ -231,7 +421,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </li>
             `
         }).join('')
-    
+
         return `
             <div class="modal fade" id="viewModal${examen.id}" tabindex="-1" aria-labelledby="viewModalLabel${examen.id}" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -266,7 +456,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const modalElement = document.getElementById(`activeModal${id}`)
                         const modal = new bootstrap.Modal(modalElement)
                         modal.hide()
-                    }else{
+                    } else {
                         const modalElement2 = document.getElementById(`deleteModal${id}`)
                         console.log(modalElement2)
                         const modal2 = new bootstrap.Modal(modalElement2)
