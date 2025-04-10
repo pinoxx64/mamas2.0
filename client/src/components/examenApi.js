@@ -52,3 +52,29 @@ export const activeOrDesableExamen = async (id) => {
         throw error
     }
 }
+
+export const postExamen = async (examen) => {
+    const rutaExamen = constantes.urlApi + constantes.examen
+    try {
+        const token = sessionStorage.getItem('token')
+        const respuesta = await fetch(rutaExamen, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify(examen)
+        })
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al crear el examen. Código de estado: ${respuesta.status}`)
+        }
+
+        const resultado = await respuesta.json()
+        return resultado
+    } catch (error) {
+        console.error('Error en la función postExamen:', error.message)
+        throw error
+    }
+}
