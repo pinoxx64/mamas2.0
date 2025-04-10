@@ -37,7 +37,7 @@ class ExamenController extends Controller
     }
 
     public function postExamen(Request $request){
-        $$validator= Validator::make($request->all(), [
+        $validator= Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'fhInicio' => 'required|date',
             'fhFinal' => 'required|date',

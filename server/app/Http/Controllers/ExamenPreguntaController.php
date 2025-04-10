@@ -62,4 +62,15 @@ class ExamenPreguntaController extends Controller
         $examenPregunta->delete();
         return response()->json(['message' => 'Registro eliminado correctamente'], 200);
     }
+
+    public function deleteExamenPreguntaByExamenIdAndPreguntaId($examenId, $preguntaId){
+        $examenPregunta = ExamenPregunta::where('examenId', $examenId)->where('preguntaId', $preguntaId)->first();
+
+        if (!$examenPregunta) {
+            return response()->json(['message' => 'examenPregunta don`t find'], 404);
+        }
+
+        $examenPregunta->delete();
+        return response()->json(['message' => 'Registro eliminado correctamente'], 200);
+    }
 }
