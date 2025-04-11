@@ -88,6 +88,7 @@ Route::prefix('examenPregunta')->middleware('auth:sanctum')->group(function() {
     Route::get('/examen/{id}', [ExamenPreguntaController::class, 'getExamenPreguntaByExamenId']);
     Route::post('/', [ExamenPreguntaController::class, 'postExamenPregunta']);
     Route::delete('/{id}', [ExamenPreguntaController::class, 'deleteExamenPregunta']);
+    Route::delete('/examen/{examenId}/{preguntaId}', [ExamenPreguntaController::class, 'deleteExamenPreguntaByExamenIdAndPreguntaId']);
 });
 
 //Auth
