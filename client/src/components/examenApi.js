@@ -78,3 +78,29 @@ export const postExamen = async (examen) => {
         throw error
     }
 }
+
+export const putExamen = async (id, examen) => {
+    const rutaExamen = constantes.urlApi + constantes.examen + id
+    try {
+        const token = sessionStorage.getItem('token')
+        const respuesta = await fetch(rutaExamen, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify(examen)
+        })
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al actualizar el examen. Código de estado: ${respuesta.status}`)
+        }
+
+        const resultado = await respuesta.json()
+        return resultado
+    } catch (error) {
+        console.error('Error en la función putExamen:', error.message)
+        throw error
+    }
+}

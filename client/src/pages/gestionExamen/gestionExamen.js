@@ -1,17 +1,11 @@
-import { getExamen, postExamen } from "../../components/examenApi"
+import { getExamen, postExamen, activeOrDesableExamen, putExamen } from "../../components/examenApi"
 import { getAsignatura } from "../../components/asignaturaApi"
 import { getPreguntasWithRespuestas, postPregunta } from "../../components/preguntaApi"
 import { postRespuesta } from "../../components/respuestaApi"
-import { postExamenPregunta } from "../../components/examenPreguntaApi"
+import { postExamenPregunta, deleteExamenPregunta } from "../../components/examenPreguntaApi"
 
 document.addEventListener("DOMContentLoaded", async function () {
     const asignaturas = await getAsignatura()
-
-
-
-
-
-
 
     // Función para rellenar la tabla de examenes
 
@@ -53,10 +47,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                     examen.fhFinal,
                     asignatura,
                     `
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal${examen.id}"><i class="fas fa-edit"></i> Editar examen</button>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editarExamenModal${examen.id}"><i class="fas fa-edit"></i> Editar examen</button>
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${examen.id}"><i class="fas fa-edit"></i> Activar examen</button>
                     <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examen.id}">Ver preguntas</button>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPreguntaModal${examen.id}">Editar preguntas</button>
                     `
                 ]).draw()
 
@@ -64,12 +57,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 activeOrDesableExamenUI(examen.id, 'active')
 
                 document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
+                mostrarPreguntasExamen(examen)
 
                 document.body.insertAdjacentHTML('beforeend', editarExamenModal(examen))
                 editarExamenUI(examen)
 
-                document.body.insertAdjacentHTML('beforeend', verPreguntasExamenModal(examen.id, examen.preguntas))
-                //mostrarPreguntasExamen(examen.id)
             }
         })
     }
@@ -138,10 +130,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             return `
-                <li class="list-group-item">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
                     <strong>${pregunta.tipo}:</strong> ${pregunta.pregunta}
                     ${opcionesHtml}
-                </li>
+                </div>
+                <input type="checkbox" class="form-check-input checkboxPregunta" data-id="${pregunta.id}" title="Seleccionar para eliminar">
+            </li>
             `
         }).join('')
 
@@ -159,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             </ul>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="guardarCambiosPreguntas${examen.id}">Eliminar Preguntas Seleccionadas</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         </div>
                     </div>
@@ -197,38 +193,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-primary" id="guardarCambiosExamen${examen.id}">Guardar Cambios</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `
-    }
-
-    // Editar preguntas de cada examen
-
-    function verPreguntasExamenModal(examenId, preguntas) {
-        const preguntasHtml = preguntas.map(pregunta => `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>${pregunta.pregunta}</span>
-                    <button class="btn btn-danger btn-sm eliminarPregunta" data-id="${pregunta.id}">Eliminar</button>
-                </li>
-            `).join('')
-
-        return `
-                <div class="modal fade" id="verPreguntasExamenModal${examenId}" tabindex="-1" aria-labelledby="verPreguntasExamenModalLabel${examenId}" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="verPreguntasExamenModalLabel${examenId}">Preguntas del Examen</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <ul class="list-group">
-                                    ${preguntasHtml}
-                                </ul>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -318,9 +282,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         respuestaPregunta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ")
                         opciones = opciones.map(opcion => opcion.texto)
                         tipoPregunta = "opciones multiples"
-                    } else {
-                        alert("Debe seleccionar al menos una opción como respuesta.")
-                        return
                     }
                 } else {
                     // Manejar preguntas de texto o número
@@ -372,7 +333,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 opcionesContainer.classList.add("d-none")
             } catch (error) {
                 console.error("Error al guardar la pregunta:", error)
-                alert("Ocurrió un error al guardar la pregunta. Por favor, inténtelo de nuevo.")
             }
         })
     
@@ -397,26 +357,26 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     
         listaPreguntas.addEventListener("click", async (e) => {
-            e.preventDefault();
+            e.preventDefault()
         
             if (e.target.classList.contains("seleccionarPregunta")) {
-                const preguntaId = e.target.getAttribute("data-id");
-                const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId);
+                const preguntaId = e.target.getAttribute("data-id")
+                const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId)
         
                 if (preguntaSeleccionada) {
-                    preguntasExamen.push(preguntaSeleccionada.id);
+                    preguntasExamen.push(preguntaSeleccionada.id)
         
                     document.getElementById("preguntasExamen").innerHTML += `
                         <li class="list-group-item">
                             <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
                             ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
                         </li>
-                    `;
+                    `
         
-                    importarPreguntasContainer.classList.add("d-none");
+                    importarPreguntasContainer.classList.add("d-none")
                 }
             }
-        });
+        })
         // Guardar examen
         const guardarExamenBtn = document.getElementById("guardarExamenBtn")
         guardarExamenBtn.addEventListener("click", async () => {
@@ -445,7 +405,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     })
                 }
     
-                alert("Examen creado exitosamente.")
                 location.reload()
             } catch (error) {
                 console.error("Error al guardar el examen:", error)
@@ -480,7 +439,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Función para manejar la edición del examen
     function editarExamenUI(examen) {
         const modalHtml = editarExamenModal(examen)
         document.body.insertAdjacentHTML("beforeend", modalHtml)
@@ -504,63 +462,37 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.log("Datos actualizados del examen:", datosActualizados)
 
                 await putExamen(examen.id, datosActualizados)
-
-                alert("Examen actualizado exitosamente.")
                 location.reload()
             } catch (error) {
                 console.error("Error al actualizar el examen:", error)
-                alert("Ocurrió un error al actualizar el examen. Por favor, inténtelo de nuevo.")
             }
         })
     }
 
-    async function mostrarPreguntasExamen(examenId) {
-        try {
-            // Obtener las preguntas del examen por su ID
-            const response = await fetch(`/api/examenPregunta/examen/${examenId}`)
-            const data = await response.json()
-
-            if (!data.examenPregunta || data.examenPregunta.length === 0) {
-                alert("No hay preguntas asociadas a este examen.")
-                return
-            }
-
-            // Crear el modal con las preguntas
-            const modalHtml = verPreguntasExamenModal(examenId, data.examenPregunta)
-            document.body.insertAdjacentHTML("beforeend", modalHtml)
-
-            // Mostrar el modal
-            const modal = new bootstrap.Modal(document.getElementById(`verPreguntasExamenModal${examenId}`))
-            modal.show()
-
-            // Manejar la eliminación de preguntas
-            document.querySelectorAll(`#verPreguntasExamenModal${examenId} .eliminarPregunta`).forEach(button => {
-                button.addEventListener("click", async (e) => {
-                    const preguntaId = e.target.getAttribute("data-id")
-
-                    if (confirm("¿Estás seguro de que deseas eliminar esta pregunta del examen?")) {
-                        try {
-                            const deleteResponse = await fetch(`/api/examenPregunta/examen/${examenId}/${preguntaId}`, {
-                                method: "DELETE",
-                            })
-
-                            if (deleteResponse.ok) {
-                                alert("Pregunta eliminada del examen correctamente.")
-                                modal.hide()
-                                location.reload() // Recargar la página para actualizar la lista
-                            } else {
-                                alert("Error al eliminar la pregunta del examen.")
-                            }
-                        } catch (error) {
-                            console.error("Error al eliminar la pregunta:", error)
-                            alert("Ocurrió un error al eliminar la pregunta.")
-                        }
+    async function mostrarPreguntasExamen(examen) {
+        const modalHtml = verPreguntasModal(examen)
+        document.body.insertAdjacentHTML("beforeend", modalHtml)
+    
+        const modalElement = document.getElementById(`viewModal${examen.id}`)
+        const guardarCambiosBtn = document.getElementById(`guardarCambiosPreguntas${examen.id}`)
+    
+        if (guardarCambiosBtn) {
+            guardarCambiosBtn.addEventListener("click", async () => {
+                try {
+                    const checkboxes = document.querySelectorAll(`#viewModal${examen.id} .checkboxPregunta:checked`)
+                    const preguntasAEliminar = Array.from(checkboxes).map(checkbox => checkbox.getAttribute("data-id"))
+    
+                    for (const preguntaId of preguntasAEliminar) {
+                        await deleteExamenPregunta(examen.id, preguntaId)
                     }
-                })
+    
+                    const modal = bootstrap.Modal.getInstance(modalElement)
+                    modal.hide()
+                    location.reload()
+                } catch (error) {
+                    console.error("Error al eliminar las preguntas:", error)
+                }
             })
-        } catch (error) {
-            console.error("Error al obtener las preguntas del examen:", error)
-            alert("Ocurrió un error al obtener las preguntas del examen.")
         }
     }
     await crearExamen()

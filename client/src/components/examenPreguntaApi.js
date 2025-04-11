@@ -26,8 +26,8 @@ export const postExamenPregunta = async (examenPregunta) => {
     }
 }
 
-export const deleteExamenPregunta = async (id) => {
-    const rutaExamenPregunta = constantes.urlApi + constantes.examenPregunta + id
+export const deleteExamenPregunta = async (examenId, preguntaId) => {
+    const rutaExamenPregunta = constantes.urlApi + constantes.examenPregunta + 'examen/' + examenId + '/' + preguntaId
     try {
         const token = sessionStorage.getItem('token')
         const respuesta = await fetch(rutaExamenPregunta, {
