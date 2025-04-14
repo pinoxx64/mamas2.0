@@ -98,4 +98,14 @@ class ExamenController extends Controller
 
         return response()->json(['examen' => $examen], Response::HTTP_OK);
     }
+
+    public function getExamenActiveWithPreguntasByAsignaturaId($id){
+        $examenes = Examen::where('asignaturaId', $id)->where('active', 1)->with(['preguntas.respuestas'])->get();
+
+        if (!$examenes) {
+            return response()->json(['message' => 'examen no encontrado'], 404);
+        }
+
+        return response()->json(['examenes' => $examenes], Response::HTTP_OK);
+    }
 }

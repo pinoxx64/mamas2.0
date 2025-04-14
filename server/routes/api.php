@@ -80,6 +80,7 @@ Route::prefix('examen')->middleware('auth:sanctum')->group(function() {
         Route::put('/activeOrDesable/{id}', [ExamenController::class, 'activeOrDesableExamen']);
     });
     Route::get('/{id}', [ExamenController::class, 'getExamenById']);
+    Route::get('/asignatura/{id}', [ExamenController::class, 'getExamenActiveWithPreguntasByAsignaturaId']);
 });
 
 // ExamenPreguntas
