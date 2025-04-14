@@ -10,6 +10,7 @@ class ExamenPregunta extends Model
     protected $fillable = [
         'examenId',
         'preguntaId',
+        'puntuacion'
     ];
     public function examen()
     {

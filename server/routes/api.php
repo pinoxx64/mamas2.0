@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AsignaturaAlumnoController;
 use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamenController;
@@ -89,6 +90,17 @@ Route::prefix('examenPregunta')->middleware('auth:sanctum')->group(function() {
     Route::post('/', [ExamenPreguntaController::class, 'postExamenPregunta']);
     Route::delete('/{id}', [ExamenPreguntaController::class, 'deleteExamenPregunta']);
     Route::delete('/examen/{examenId}/{preguntaId}', [ExamenPreguntaController::class, 'deleteExamenPreguntaByExamenIdAndPreguntaId']);
+});
+
+// AsignaturaAlumno
+Route::prefix('asignaturaAlumno')->group(function() {
+    Route::middleware('auth:sanctum')->group(function() {
+        Route::get('/', [AsignaturaAlumnoController::class, 'getAsignaturaAlumno']);
+        Route::get('/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoById']);
+        Route::get('/usuario/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoByUserId']);
+        Route::get('/asignatura/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoByAsignaturaId']);
+    });
+    Route::post('/', [AsignaturaAlumnoController::class, 'postAsignaturaAlumno']);
 });
 
 //Auth

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('examenId');
             $table->unsignedBigInteger('preguntaId');
+            $table->float('puntuacion')->default(1);
             $table->timestamps();
 
             $table->foreign('examenId')->references('id')->on('examen')->onDelete('cascade');

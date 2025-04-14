@@ -16,19 +16,23 @@ class ExamenPreguntaSeeder extends Seeder
         $examenPreguntas = [
             [
                 'examenId' => 1,
-                'preguntaId' => 1
+                'preguntaId' => 1,
+                'puntuacion' => 1
             ],
             [
                 'examenId' => 1,
-                'preguntaId' => 2
+                'preguntaId' => 2,
+                'puntuacion' => 1
             ],
             [
                 'examenId' => 2,
-                'preguntaId' => 3
+                'preguntaId' => 3,
+                'puntuacion' => 1
             ],
             [
                 'examenId' => 2,
-                'preguntaId' => 4
+                'preguntaId' => 4,
+                'puntuacion' => 1
             ]
         ];
 
