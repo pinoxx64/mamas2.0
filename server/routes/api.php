@@ -5,8 +5,10 @@ use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\ExamenPreguntaController;
+use App\Http\Controllers\NotaExamenController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
+use App\Http\Controllers\RespuestaExamenController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserRolController;
@@ -96,13 +98,30 @@ Route::prefix('examenPregunta')->middleware('auth:sanctum')->group(function() {
 
 // AsignaturaAlumno
 Route::prefix('asignaturaAlumno')->group(function() {
-    Route::middleware('auth:sanctum')->group(function() {
+    Route::middleware(['auth:sanctum', 'midAlumno'])->group(function() {
         Route::get('/', [AsignaturaAlumnoController::class, 'getAsignaturaAlumno']);
         Route::get('/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoById']);
         Route::get('/usuario/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoByUserId']);
         Route::get('/asignatura/{id}', [AsignaturaAlumnoController::class, 'getAsignaturaAlumnoByAsignaturaId']);
     });
     Route::post('/', [AsignaturaAlumnoController::class, 'postAsignaturaAlumno']);
+});
+
+// NotaExamen
+Route::prefix('notaExamen')->middleware('auth:sanctum')->group(function() {
+    Route::get('/', [NotaExamenController::class, 'getNotaExamen']);
+    Route::get('/{id}', [NotaExamenController::class, 'getNotaExamenById']);
+    Route::get('/usuario/{usuarioId}/{examenId}', [NotaExamenController::class, 'getNotaExamenByUsuarioIdAndExamenId']);
+    Route::post('/', [NotaExamenController::class, 'postNotaExamen']);
+    Route::put('/{id}', [NotaExamenController::class, 'putNotaExamen']);
+});
+
+// RespuestaExamen
+Route::prefix('respuestaExamen')->middleware('auth:sanctum')->group(function() {
+    Route::get('/', [RespuestaExamenController::class, 'getRespuestaExamen']);
+    Route::get('/{id}', [RespuestaExamenController::class, 'getRespuestaExamenById']);
+    Route::get('/usuario/{usuarioId}/{examenId}', [RespuestaExamenController::class, 'getRespuestaExamenByUsuarioIdAndExamenId']);
+    Route::post('/', [RespuestaExamenController::class, 'postRespuestaExamen']);
 });
 
 //Auth
