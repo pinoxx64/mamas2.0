@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asignatura;
 use App\Models\Examen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -99,13 +100,22 @@ class ExamenController extends Controller
         return response()->json(['examen' => $examen], Response::HTTP_OK);
     }
 
-    public function getExamenActiveWithPreguntasByAsignaturaId($id){
-        $examenes = Examen::where('asignaturaId', $id)->where('active', 1)->with(['preguntas.respuestas'])->get();
+    public function getExamenActiveWithPreguntasByUserId($id){
+        $asignaturasUsuario = Asignatura::where('usuarioId', $id)->pluck('id');
 
-        if (!$examenes) {
-            return response()->json(['message' => 'examen no encontrado'], 404);
+        if ($asignaturasUsuario->isEmpty()) {
+            return response()->json(['message' => 'El usuario no tiene asignaturas asociadas'], 404);
         }
-
+    
+        $examenes = Examen::whereIn('asignaturaId', $asignaturasUsuario)
+            ->where('active', 1)
+            ->with(['preguntas.respuestas', 'asignatura'])
+            ->get();
+    
+        if ($examenes->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron exámenes activos para las asignaturas del usuario'], 404);
+        }
+    
         return response()->json(['examenes' => $examenes], Response::HTTP_OK);
     }
 }
