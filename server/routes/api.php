@@ -74,13 +74,14 @@ Route::prefix('respuesta')->middleware('auth:sanctum')->group(function() {
 Route::prefix('examen')->middleware('auth:sanctum')->group(function() {
     Route::middleware('midProfesor')->group(function() {
         Route::get('/', [ExamenController::class, 'getExamen']);
+        Route::get('/{id}', [ExamenController::class, 'getExamenById']);
         Route::get('/usuario/{id}', [ExamenController::class, 'getExamenByUsuarioId']);
         Route::post('/', [ExamenController::class, 'postExamen']);
         Route::put('/{id}', [ExamenController::class, 'putExamen']);
         Route::put('/activeOrDesable/{id}', [ExamenController::class, 'activeOrDesableExamen']);
     });
     Route::get('/{id}', [ExamenController::class, 'getExamenById']);
-    Route::get('/asignatura/{id}', [ExamenController::class, 'getExamenActiveWithPreguntasByAsignaturaId']);
+    Route::get('/asignatura/{id}', [ExamenController::class, 'getExamenActiveWithPreguntasByUserId']);
 });
 
 // ExamenPreguntas

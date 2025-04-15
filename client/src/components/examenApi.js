@@ -26,6 +26,32 @@ export const getExamen = async () => {
     }
 }
 
+export const getExamenById = async (id) => {
+    const rutaExamen = constantes.urlApi + constantes.examen + id
+    try {
+        const token = sessionStorage.getItem('token')
+        const respuesta = await fetch(rutaExamen, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al buscar el examen. Código de estado: ${respuesta.status}`)
+        }
+
+        const resultado = await respuesta.json()
+        console.log(resultado)
+        return resultado
+    } catch (error) {
+        console.error('Error en la función getExamenById:', error.message)
+        throw error
+    }
+}
+
 export const activeOrDesableExamen = async (id) => {
     const rutaExamen = constantes.urlApi + constantes.examen + 'activeOrDesable/' + id
     console.log(rutaExamen)
@@ -105,7 +131,7 @@ export const putExamen = async (id, examen) => {
     }
 }
 
-export const getExamenActiveWithPreguntasByAsignaturaId = async (id) => {
+export const getExamenActiveWithPreguntasByUserId = async (id) => {
     const rutaExamen = constantes.urlApi + constantes.examen + 'asignatura/' + id
     try {
         const token = sessionStorage.getItem('token')
