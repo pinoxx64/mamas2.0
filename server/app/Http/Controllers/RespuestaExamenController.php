@@ -26,6 +26,16 @@ class RespuestaExamenController extends Controller
         return response()->json(['respuestaExamen' => $respuestaExamen]);
     }
 
+    public function getRespuestaExamenWithExamenId($examenId){
+        $respuestaExamen = RespuestaExamen::where('examenId', $examenId)->get();
+
+        if (!$respuestaExamen) {
+            return response()->json(['message' => 'Respuesta no encontrada'], 404);
+        }
+
+        return response()->json(['respuestaExamen' => $respuestaExamen]);
+    }
+
     public function getRespuestaExamenByUsuarioIdAndExamenId($usuarioId, $examenId){
         $respuestaExamen = RespuestaExamen::where('usuarioId', $usuarioId)->where('examenId', $examenId)->get();
 
