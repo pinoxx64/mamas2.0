@@ -1,6 +1,6 @@
 import { constantes } from "./constantes"
 
-export const postExamenPregunta = async (examenPregunta) => {
+export const postExamenPregunta = async (examenesPreguntas) => {
     const rutaExamenPregunta = constantes.urlApi + constantes.examenPregunta
     try {
         const token = sessionStorage.getItem('token')
@@ -11,7 +11,7 @@ export const postExamenPregunta = async (examenPregunta) => {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify(examenPregunta)
+            body: JSON.stringify(examenesPreguntas)
         })
 
         if (!respuesta.ok) {

@@ -118,4 +118,34 @@ class ExamenController extends Controller
     
         return response()->json(['examenes' => $examenes], Response::HTTP_OK);
     }
+
+    public function getExamenWithInfo($usuarioId)
+    {
+        $examenes = Examen::where('usuarioId', $usuarioId)
+            ->with(['preguntas', 'respuestasExamen.pregunta'])
+            ->get();
+    
+        if ($examenes->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron exámenes creados por este usuario'], 404);
+        }
+
+        $data = $examenes->map(function ($examen) {
+            return [
+                'examenId' => $examen->id,
+                'nombre' => $examen->nombre,
+                'preguntas' => $examen->preguntas,
+                'respuestas' => $examen->respuestasExamen->map(function ($respuesta) {
+                    return [
+                        'respuestaId' => $respuesta->id,
+                        'preguntaId' => $respuesta->preguntaId,
+                        'pregunta' => $respuesta->pregunta->pregunta,
+                        'usuarioId' => $respuesta->usuarioId,
+                        'respuesta' => $respuesta->respuesta,
+                    ];
+                }),
+            ];
+        });
+    
+        return response()->json(['examenes' => $data], Response::HTTP_OK);
+    }
 }

@@ -84,6 +84,7 @@ Route::prefix('examen')->middleware('auth:sanctum')->group(function() {
     });
     Route::get('/{id}', [ExamenController::class, 'getExamenById']);
     Route::get('/asignatura/{id}', [ExamenController::class, 'getExamenActiveWithPreguntasByUserId']);
+    Route::get('/info/{id}', [ExamenController::class, 'getExamenWithInfo']);
 });
 
 // ExamenPreguntas
