@@ -13,4 +13,14 @@ class RespuestaExamen extends Model
         'usuarioId',
         'respuesta',
     ];
+
+    public function pregunta()
+    {
+        return $this->belongsTo(Pregunta::class, 'preguntaId');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'usuarioId');
+    }
 }

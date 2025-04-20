@@ -122,30 +122,34 @@ class ExamenController extends Controller
     public function getExamenWithInfo($usuarioId)
     {
         $examenes = Examen::where('usuarioId', $usuarioId)
-            ->with(['preguntas', 'respuestasExamen.pregunta'])
-            ->get();
-    
-        if ($examenes->isEmpty()) {
-            return response()->json(['message' => 'No se encontraron exámenes creados por este usuario'], 404);
-        }
+        ->with(['respuestasExamen.usuario', 'respuestasExamen.pregunta'])
+        ->get();
 
-        $data = $examenes->map(function ($examen) {
-            return [
-                'examenId' => $examen->id,
-                'nombre' => $examen->nombre,
-                'preguntas' => $examen->preguntas,
-                'respuestas' => $examen->respuestasExamen->map(function ($respuesta) {
-                    return [
-                        'respuestaId' => $respuesta->id,
-                        'preguntaId' => $respuesta->preguntaId,
-                        'pregunta' => $respuesta->pregunta->pregunta,
-                        'usuarioId' => $respuesta->usuarioId,
-                        'respuesta' => $respuesta->respuesta,
-                    ];
-                }),
-            ];
-        });
-    
-        return response()->json(['examenes' => $data], Response::HTTP_OK);
+    if ($examenes->isEmpty()) {
+        return response()->json(['message' => 'No se encontraron exámenes creados por este usuario'], 404);
+    }
+
+    $data = $examenes->map(function ($examen) {
+        return [
+            'examenId' => $examen->id,
+            'nombre' => $examen->nombre,
+            'usuarios' => $examen->respuestasExamen->groupBy('usuarioId')->map(function ($respuestasUsuario) {
+                return [
+                    'usuarioId' => $respuestasUsuario->first()->usuario->id,
+                    'usuarioNombre' => $respuestasUsuario->first()->usuario->name ?? 'Desconocido',
+                    'respuestas' => $respuestasUsuario->map(function ($respuesta) {
+                        return [
+                            'respuestaId' => $respuesta->id,
+                            'preguntaId' => $respuesta->preguntaId,
+                            'pregunta' => $respuesta->pregunta->pregunta ?? 'Pregunta no encontrada',
+                            'respuesta' => $respuesta->respuesta
+                        ];
+                    })
+                ];
+            })->values()
+        ];
+    });
+
+    return response()->json(['examenes' => $data], Response::HTTP_OK);
     }
 }

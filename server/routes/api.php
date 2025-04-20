@@ -123,6 +123,7 @@ Route::prefix('respuestaExamen')->middleware('auth:sanctum')->group(function() {
     Route::get('/{id}', [RespuestaExamenController::class, 'getRespuestaExamenById']);
     Route::get('/usuario/{usuarioId}/{examenId}', [RespuestaExamenController::class, 'getRespuestaExamenByUsuarioIdAndExamenId']);
     Route::post('/', [RespuestaExamenController::class, 'postRespuestaExamen']);
+    Route::get('/examen/{examenId}', [RespuestaExamenController::class, 'getRespuestaExamenWithExamenAndUserByExamenId']);
 });
 
 //Auth
