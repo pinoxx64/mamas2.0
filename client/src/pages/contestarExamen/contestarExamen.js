@@ -125,6 +125,7 @@
 // })
 
 import { getExamenById } from "../../components/examenApi";
+import { postRespuestaExamen } from "../../components/respuestaExamenApi";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const examenId = sessionStorage.getItem('examenId');
@@ -249,12 +250,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     examenId: examen.examen.id,
                     preguntaId: pregunta.id,
                     usuarioId: userId,
-                    respuesta: seleccionadas.join(', ') // Combinar múltiples respuestas en una cadena
+                    respuesta: seleccionadas.join(', ')
                 });
             }
         });
-
+        await postRespuestaExamen(respuestas)
         console.log('Respuestas enviadas:', respuestas);
+        window.location.href = '../resolverExamen/resultadoExamen.html'
     });
 
     mainContent.appendChild(exam);

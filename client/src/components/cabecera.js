@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           document.getElementById("botonesCabecera").innerHTML += `
             <button class="btn" onclick="location.href='../gestionPregunta/gestionPregunta.html'" style="background-color: #ff4040; color: white;">Gestionar Preguntas</button>
             <button class="btn" onclick="location.href='../gestionExamen/gestionExamen.html'" style="background-color: #ff4040; color: white;">Gestionar Examenes</button>
+            <button class="btn" onclick="location.href='../correguirExamen/correguirExamen.html'" style="background-color: #ff4040; color: white;">Correguir Examenes</button>
           `
         }else if (userRol.user[i].rolId == 3) {
           document.getElementById("botonesCabecera").innerHTML += `

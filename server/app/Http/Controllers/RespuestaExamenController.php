@@ -10,13 +10,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RespuestaExamenController extends Controller
 {
-    public function getRespuestaExamen(){
+    public function getRespuestaExamen()
+    {
         $respuestaExamen = RespuestaExamen::all();
 
         return response()->json(['respuestaExamen' => $respuestaExamen]);
     }
 
-    public function getRespuestaExamenById($id){
+    public function getRespuestaExamenById($id)
+    {
         $respuestaExamen = RespuestaExamen::find($id);
 
         if (!$respuestaExamen) {
@@ -26,7 +28,8 @@ class RespuestaExamenController extends Controller
         return response()->json(['respuestaExamen' => $respuestaExamen]);
     }
 
-    public function getRespuestaExamenWithExamenId($examenId){
+    public function getRespuestaExamenWithExamenId($examenId)
+    {
         $respuestaExamen = RespuestaExamen::where('examenId', $examenId)->get();
 
         if (!$respuestaExamen) {
@@ -36,7 +39,8 @@ class RespuestaExamenController extends Controller
         return response()->json(['respuestaExamen' => $respuestaExamen]);
     }
 
-    public function getRespuestaExamenByUsuarioIdAndExamenId($usuarioId, $examenId){
+    public function getRespuestaExamenByUsuarioIdAndExamenId($usuarioId, $examenId)
+    {
         $respuestaExamen = RespuestaExamen::where('usuarioId', $usuarioId)->where('examenId', $examenId)->get();
 
         if (!$respuestaExamen) {
@@ -46,24 +50,50 @@ class RespuestaExamenController extends Controller
         return response()->json(['respuestaExamen' => $respuestaExamen]);
     }
 
-    public function postRespuestaExamen(Request $request){
-        $validator = Validator::make($request->all(), [
-            'examenId' => 'required|integer',
-            'preguntaId' => 'required|integer',
-            'usuarioId' => 'required|integer',
-            'respuesta' => 'required|string'
-        ]);
+    public function postRespuestaExamen(Request $request)
+    {
+        $respuestas = $request->all();
+    
+        if (empty($respuestas)) {
+            return response()->json(['message' => 'El array de respuestas está vacío'], Response::HTTP_BAD_REQUEST);
+        }
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }else{
-            $respuestaExamen = RespuestaExamen::create([
-                'examenId' => $request['examenId'],
-                'preguntaId' => $request['preguntaId'],
-                'usuarioId' => $request['usuarioId'],
-                'respuesta' => $request['respuesta']
+        $busqueda = RespuestaExamen::where('examenId', $respuestas[0]['examenId'])->where('usuarioId', $respuestas[0]['usuarioId']);
+        if ($busqueda) {
+            RespuestaExamen::where('examenId', $respuestas[0]['examenId'])->where('usuarioId', $respuestas[0]['usuarioId'])->delete();
+        }
+
+        $respuestasGuardadas = [];
+        $errores = [];
+    
+        foreach ($respuestas as $res) {
+            $validator = Validator::make($res, [
+                'examenId' => 'required|integer',
+                'preguntaId' => 'required|integer',
+                'usuarioId' => 'required|integer',
+                'respuesta' => 'required|string'
             ]);
-            return response()->json($respuestaExamen, Response::HTTP_CREATED);
-        }        
+    
+            if ($validator->fails()) {
+                $errores[] = [
+                    'respuesta' => $res,
+                    'errores' => $validator->errors()->all()
+                ];
+            }else{
+                $respuestaExamen = RespuestaExamen::create([
+                    'examenId' => $res['examenId'],
+                    'preguntaId' => $res['preguntaId'],
+                    'usuarioId' => $res['usuarioId'],
+                    'respuesta' => $res['respuesta']
+                ]);
+    
+                $respuestasGuardadas[] = $respuestaExamen;
+            }
+        }
+    
+        return response()->json([
+            'message' => 'Todas las respuestas se guardaron correctamente',
+            'respuestasGuardadas' => $respuestasGuardadas
+        ], Response::HTTP_CREATED);
     }
 }
