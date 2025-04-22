@@ -112,9 +112,13 @@ Route::prefix('asignaturaAlumno')->group(function() {
 Route::prefix('notaExamen')->middleware('auth:sanctum')->group(function() {
     Route::get('/', [NotaExamenController::class, 'getNotaExamen']);
     Route::get('/{id}', [NotaExamenController::class, 'getNotaExamenById']);
+    Route::get('/usu/{usuarioId}', [NotaExamenController::class, 'getNotaExamenByUsuarioId']);
     Route::get('/usuario/{usuarioId}/{examenId}', [NotaExamenController::class, 'getNotaExamenByUsuarioIdAndExamenId']);
     Route::post('/', [NotaExamenController::class, 'postNotaExamen']);
     Route::put('/{id}', [NotaExamenController::class, 'putNotaExamen']);
+    Route::post('/calcularNotaYGuardar', [NotaExamenController::class, 'calcularNotaYGuardar']);
+    Route::post('/correguirAuto', [NotaExamenController::class, 'correguirAuto']);
+    Route::post('/correguirAutoTodo', [NotaExamenController::class, 'correguirAutoTodo']);
 });
 
 // RespuestaExamen

@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }else if (userRol.user[i].rolId == 3) {
           document.getElementById("botonesCabecera").innerHTML += `
             <button class="btn" onclick="location.href='../resolverExamen/resolverExamen.html'" style="background-color: #ff4040; color: white;">Resolver examenes</button>
+            <button class="btn" onclick="location.href='../verNotas/verNotas.html'" style="background-color: #ff4040; color: white;">Ver notas</button>
           `
         }
       }

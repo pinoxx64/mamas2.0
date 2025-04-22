@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('examenId');
             $table->unsignedBigInteger('usuarioId');
-            $table->float('nota')->default(0.00);
+            $table->decimal('nota')->default(0.00);
             $table->timestamps();
 
             $table->foreign('examenId')->references('id')->on('examen')->onDelete('cascade');

@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class NotasExamen extends Model
 {
-    protected $table = 'notas_examen';
+    protected $table = 'nota_examen';
     protected $fillable = [
         'examenId',
         'usuarioId',
         'nota',
     ];
+
+    public function examen()
+    {
+        return $this->belongsTo(Examen::class, 'examenId');
+    }
 }

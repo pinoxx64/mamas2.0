@@ -13,6 +13,7 @@ export const constantes = {
     examen: 'examen/',
     examenPregunta: 'examenPregunta/',
     respuestaExamen: 'respuestaExamen/',
+    notaExamen: 'notaExamen/',
 
     nameValid: /^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,50}$/,
     emailValid: /^[\w.%+-]{2,}@[\w.-]{2,}\.\w{2,}$/,

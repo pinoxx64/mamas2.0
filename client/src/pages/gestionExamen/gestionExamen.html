@@ -48,51 +48,41 @@
                 <div class="modal-body">
                     <form id="crearExamenForm">
                         <div class="row">
-                            <!-- Nombre del examen -->
                             <div class="col-12 mb-3">
                                 <label for="nombreExamen" class="form-label">Nombre del Examen</label>
                                 <input type="text" id="nombreExamen" class="form-control" placeholder="Escribe el nombre del examen" required>
                             </div>
     
-                            <!-- Fecha y hora de inicio -->
                             <div class="col-md-6 mb-3">
                                 <label for="fechaInicio" class="form-label">Fecha y Hora de Inicio</label>
                                 <input type="datetime-local" id="fechaInicio" class="form-control" required>
                             </div>
     
-                            <!-- Fecha y hora de fin -->
                             <div class="col-md-6 mb-3">
                                 <label for="fechaFin" class="form-label">Fecha y Hora de Fin</label>
                                 <input type="datetime-local" id="fechaFin" class="form-control" required>
                             </div>
     
-                            <!-- Asignatura -->
                             <div class="col-12 mb-3">
                                 <label for="asignaturaExamen" class="form-label">Asignatura</label>
                                 <select id="asignaturaExamen" class="form-select" required>
-                                    <!-- Opciones dinámicas cargadas desde JavaScript -->
                                 </select>
                             </div>
     
-                            <!-- Botones para añadir o importar preguntas -->
                             <div class="col-12 mb-3">
                                 <button type="button" class="btn btn-secondary" id="mostrarCrearPregunta">Añadir Pregunta</button>
                                 <button type="button" class="btn btn-info" id="mostrarImportarPreguntas">Importar Pregunta</button>
                             </div>
     
-                            <!-- Contenedor para importar preguntas -->
                             <div class="col-12 mb-3 d-none" id="importarPreguntasContainer">
                                 <h6>Importar Pregunta</h6>
                                 <ul class="list-group" id="listaPreguntas">
-                                    <!-- Preguntas dinámicas cargadas desde JavaScript -->
                                 </ul>
                             </div>
     
-                            <!-- Lista de preguntas añadidas -->
                             <div class="col-12 mb-3">
                                 <h6>Preguntas del Examen</h6>
                                 <ul class="list-group" id="preguntasExamen">
-                                    <!-- Preguntas añadidas o importadas -->
                                 </ul>
                             </div>
                         </div>
