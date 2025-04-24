@@ -202,33 +202,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Funcion que controla el evento de editar el usuario
 
+    // async function editarUserUI(userWithUserRols, id) {
+    //     const user = userWithUserRols.user.original.user.find(u => u.id == id);
+    //     const modificarBtn = document.getElementById(`editarBtn${id}`)
+
+    //     if (modificarBtn) {
+
+    //         modificarBtn.addEventListener('click', async () => {
+    //             try {
+
+    //                 const modalElement = document.getElementById(`myModal${id}`)
+    //                 const nameUsu = modalElement.querySelector(`#name${id}`).value
+    //                 const emailUsu = modalElement.querySelector(`#email${id}`).value
+    //                 const passwordUsu = modalElement.querySelector(`#password${id}`).value
+
+    //                 const UserObjeto = {
+    //                     name: nameUsu,
+    //                     email: emailUsu,
+    //                     password: passwordUsu,
+    //                     active: user.active
+    //                 }
+    //                 await putUser(id, UserObjeto)
+
+    //                 const modal = new bootstrap.Modal(modalElement)
+    //                 modal.hide();
+    //                 location.reload()
+    //             } catch (error) {
+    //                 console.error('Error al confirmar la modificación:', error)
+    //             }
+    //         });
+    //     }
+    // }
+ 
     async function editarUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
-        const modificarBtn = document.getElementById(`editarBtn${id}`)
-
+        const modificarBtn = document.getElementById(`editarBtn${id}`);
+    
         if (modificarBtn) {
-
             modificarBtn.addEventListener('click', async () => {
                 try {
-
-                    const modalElement = document.getElementById(`myModal${id}`)
-                    const nameUsu = modalElement.querySelector(`#name${id}`).value
-                    const emailUsu = modalElement.querySelector(`#email${id}`).value
-                    const passwordUsu = modalElement.querySelector(`#password${id}`).value
-
+                    const modalElement = document.getElementById(`myModal${id}`);
+                    const nameUsu = modalElement.querySelector(`#name${id}`).value;
+                    const emailUsu = modalElement.querySelector(`#email${id}`).value;
+                    const passwordUsu = modalElement.querySelector(`#password${id}`).value;
+    
                     const UserObjeto = {
                         name: nameUsu,
                         email: emailUsu,
                         password: passwordUsu,
-                        active: user.active
-                    }
-                    await putUser(id, UserObjeto)
-
-                    const modal = new bootstrap.Modal(modalElement)
+                        active: user.active,
+                    };
+    
+                    await putUser(id, UserObjeto);
+    
+                    // Actualizar la fila en la tabla
+                    const tabla = $('#Users').DataTable();
+                    const row = tabla.row(`[data-id="${id}"]`);
+                    row.data([
+                        nameUsu,
+                        emailUsu,
+                        row.data()[2], // Mantener las acciones sin cambios
+                    ]).draw(false);
+    
+                    const modal = new bootstrap.Modal(modalElement);
                     modal.hide();
-                    location.reload()
                 } catch (error) {
-                    console.error('Error al confirmar la modificación:', error)
+                    console.error('Error al confirmar la modificación:', error);
                 }
             });
         }
@@ -236,10 +275,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Funcion que controla el evento de desactivar el usuario
 
+    // async function eliminarUserUI(userWithUserRols, id) {
+    //     const user = userWithUserRols.user.original.user.find(u => u.id == id);
+    //     const confirmarEliminacion = document.getElementById(`confirmarEliminacion${id}`)
+
+    //     if (confirmarEliminacion) {
+    //         confirmarEliminacion.addEventListener('click', async () => {
+    //             try {
+    //                 const UserObjeto = {
+    //                     name: user.name,
+    //                     email: user.email,
+    //                     password: user.password,
+    //                     active: false
+    //                 }
+    //                 console.log(UserObjeto)
+    //                 await putUser(id, UserObjeto)
+
+    //                 const modalElement = document.getElementById(`deleteModal${id}`);
+    //                 const modal = new bootstrap.Modal(modalElement);
+    //                 modal.hide();
+    //                 location.reload()
+
+
+    //             } catch (error) {
+    //                 console.error('Error al confirmar la eliminación:', error);
+    //             }
+    //         });
+    //     }
+    // }
+
     async function eliminarUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
-        const confirmarEliminacion = document.getElementById(`confirmarEliminacion${id}`)
-
+        const confirmarEliminacion = document.getElementById(`confirmarEliminacion${id}`);
+    
         if (confirmarEliminacion) {
             confirmarEliminacion.addEventListener('click', async () => {
                 try {
@@ -247,17 +315,24 @@ document.addEventListener("DOMContentLoaded", function () {
                         name: user.name,
                         email: user.email,
                         password: user.password,
-                        active: false
-                    }
-                    console.log(UserObjeto)
-                    await putUser(id, UserObjeto)
-
+                        active: false,
+                    };
+    
+                    await putUser(id, UserObjeto);
+    
+                    // Actualizar la fila en la tabla
+                    const tabla = $('#Users').DataTable();
+                    const row = tabla.row(`[data-id="${id}"]`);
+                    row.data([
+                        user.name,
+                        user.email,
+                        `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${id}"><i class="fas fa-edit"></i> Editar</button>` +
+                        `<button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${id}" ><i class="fas fa-trash-alt"></i> Añadir</button>`,
+                    ]).draw(false);
+    
                     const modalElement = document.getElementById(`deleteModal${id}`);
                     const modal = new bootstrap.Modal(modalElement);
                     modal.hide();
-                    location.reload()
-
-
                 } catch (error) {
                     console.error('Error al confirmar la eliminación:', error);
                 }
@@ -267,10 +342,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Funcion que controla el evento de activar el usuario
 
+    // async function anadirUserUI(userWithUserRols, id) {
+    //     const user = userWithUserRols.user.original.user.find(u => u.id == id);
+    //     const confirmarEliminacion = document.getElementById(`confirmarActivacion${id}`)
+
+    //     if (confirmarEliminacion) {
+    //         confirmarEliminacion.addEventListener('click', async () => {
+    //             try {
+    //                 const UserObjeto = {
+    //                     name: user.name,
+    //                     email: user.email,
+    //                     password: user.password,
+    //                     active: true
+    //                 }
+    //                 await putUser(id, UserObjeto)
+
+    //                 const modalElement = document.getElementById(`activeModal${id}`);
+    //                 const modal = new bootstrap.Modal(modalElement);
+    //                 modal.hide();
+    //                 location.reload()
+
+
+    //             } catch (error) {
+    //                 console.error('Error al confirmar la eliminación:', error);
+    //             }
+    //         });
+    //     }
+    // }
+
     async function anadirUserUI(userWithUserRols, id) {
         const user = userWithUserRols.user.original.user.find(u => u.id == id);
-        const confirmarEliminacion = document.getElementById(`confirmarActivacion${id}`)
-
+        const confirmarEliminacion = document.getElementById(`confirmarActivacion${id}`);
+    
         if (confirmarEliminacion) {
             confirmarEliminacion.addEventListener('click', async () => {
                 try {
@@ -278,18 +381,27 @@ document.addEventListener("DOMContentLoaded", function () {
                         name: user.name,
                         email: user.email,
                         password: user.password,
-                        active: true
-                    }
-                    await putUser(id, UserObjeto)
-
+                        active: true,
+                    };
+    
+                    await putUser(id, UserObjeto);
+    
+                    // Actualizar la fila en la tabla
+                    const tabla = $('#Users').DataTable();
+                    const row = tabla.row(`[data-id="${id}"]`);
+                    row.data([
+                        user.name,
+                        user.email,
+                        `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${id}"><i class="fas fa-edit"></i> Editar</button>` +
+                        `<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${id}" ><i class="fas fa-trash-alt"></i> Eliminar</button>` +
+                        `<button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rolModal${id}" ><i class="fas fa-trash-alt"></i> Roles</button>`,
+                    ]).draw(false);
+    
                     const modalElement = document.getElementById(`activeModal${id}`);
                     const modal = new bootstrap.Modal(modalElement);
                     modal.hide();
-                    location.reload()
-
-
                 } catch (error) {
-                    console.error('Error al confirmar la eliminación:', error);
+                    console.error('Error al confirmar la activación:', error);
                 }
             });
         }
@@ -297,81 +409,130 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Funcion que controla el evento de editar el rol
 
+    // async function editarRolesUI(userWithUserRols, id) {
+    //     const userRol = userWithUserRols.userRol.filter(u => u.usuarioId == id);
+    //     const modificarRolBtn = document.getElementById(`editarRolBtn${id}`)
+
+    //     if (modificarRolBtn) {
+
+    //         modificarRolBtn.addEventListener('click', async () => {
+    //             try {
+
+    //                 const modalElement = document.getElementById(`rolModal${id}`)
+    //                 const checkedProfe = document.getElementById(`profe${id}`)
+    //                 const checkedAlumno = document.getElementById(`alum${id}`)
+    //                 const checkedAdmin = document.getElementById(`admin${id}`)
+
+    //                 if (userRol.find((rol) => rol.rolId == 1) && checkedAdmin.checked == false) {
+    //                     //decir de eliminar rol admin
+    //                     await deleteUserRol(id, 1)
+    //                 } else if (userRol.find((rol) => rol.rolId == 1) == undefined && checkedAdmin.checked == true) {
+    //                     //decir de añadir rol admin
+    //                     const rolObjeto = {
+    //                         usuarioId: id,
+    //                         rolId: 1
+    //                     }
+    //                     await postUserRol(rolObjeto)
+    //                 }
+
+    //                 if (userRol.find((rol) => rol.rolId == 2) && checkedProfe.checked == false) {
+    //                     //decir de eliminar rol profe
+    //                     await deleteUserRol(id, 2)
+    //                 } else if (userRol.find((rol) => rol.rolId == 2) == undefined && checkedProfe.checked == true) {
+    //                     //decir de añadir rol profe
+    //                     const rolObjeto = {
+    //                         usuarioId: id,
+    //                         rolId: 2
+    //                     }
+    //                     await postUserRol(rolObjeto)
+    //                 }
+
+    //                 if (userRol.find((rol) => rol.rolId == 3) && checkedAlumno.checked == false) {
+    //                     //decir de eliminar rol alumno
+    //                     await deleteUserRol(id, 3)
+    //                 } else if (userRol.find((rol) => rol.rolId == 3) == undefined && checkedAlumno.checked == true) {
+    //                     //decir de añadir rol alumno
+    //                     const rolObjeto = {
+    //                         usuarioId: id,
+    //                         rolId: 3
+    //                     }
+    //                     await postUserRol(rolObjeto)
+    //                 }
+
+    //                 const userRolActualizado = await getUserRolByUserId(id)
+                    
+    //                 // si el usuairio tiene el rol de alumon no puede tener ni el de admin ni el de profesor
+
+    //                 if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 2)) {
+    //                     await deleteUserRol(id, 2)
+    //                 }else if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 1)) {
+    //                     await deleteUserRol(id, 1)
+    //                 }
+
+    //                 // si el usuario no tiene rol se le podrá el de alumno por defecto
+
+    //                 if (userRolActualizado.user.length == 0) {
+    //                     const rolObjeto = {
+    //                         usuarioId: id,
+    //                         rolId: 3
+    //                     }
+    //                     await postUserRol(rolObjeto)
+    //                 }
+
+    //                 const modal = new bootstrap.Modal(modalElement)
+    //                 modal.hide();
+    //                 location.reload()
+    //             } catch (error) {
+    //                 console.error('Error al confirmar la modificación:', error)
+    //             }
+    //         });
+    //     }
+    // }
+
     async function editarRolesUI(userWithUserRols, id) {
         const userRol = userWithUserRols.userRol.filter(u => u.usuarioId == id);
-        const modificarRolBtn = document.getElementById(`editarRolBtn${id}`)
-
+        const modificarRolBtn = document.getElementById(`editarRolBtn${id}`);
+    
         if (modificarRolBtn) {
-
             modificarRolBtn.addEventListener('click', async () => {
                 try {
-
-                    const modalElement = document.getElementById(`rolModal${id}`)
-                    const checkedProfe = document.getElementById(`profe${id}`)
-                    const checkedAlumno = document.getElementById(`alum${id}`)
-                    const checkedAdmin = document.getElementById(`admin${id}`)
-
-                    if (userRol.find((rol) => rol.rolId == 1) && checkedAdmin.checked == false) {
-                        //decir de eliminar rol admin
-                        await deleteUserRol(id, 1)
-                    } else if (userRol.find((rol) => rol.rolId == 1) == undefined && checkedAdmin.checked == true) {
-                        //decir de añadir rol admin
-                        const rolObjeto = {
-                            usuarioId: id,
-                            rolId: 1
-                        }
-                        await postUserRol(rolObjeto)
+                    const modalElement = document.getElementById(`rolModal${id}`);
+                    const checkedProfe = document.getElementById(`profe${id}`);
+                    const checkedAlumno = document.getElementById(`alum${id}`);
+                    const checkedAdmin = document.getElementById(`admin${id}`);
+    
+                    // Actualizar roles en la base de datos
+                    if (userRol.find((rol) => rol.rolId == 1) && !checkedAdmin.checked) {
+                        await deleteUserRol(id, 1);
+                    } else if (!userRol.find((rol) => rol.rolId == 1) && checkedAdmin.checked) {
+                        await postUserRol({ usuarioId: id, rolId: 1 });
                     }
-
-                    if (userRol.find((rol) => rol.rolId == 2) && checkedProfe.checked == false) {
-                        //decir de eliminar rol profe
-                        await deleteUserRol(id, 2)
-                    } else if (userRol.find((rol) => rol.rolId == 2) == undefined && checkedProfe.checked == true) {
-                        //decir de añadir rol profe
-                        const rolObjeto = {
-                            usuarioId: id,
-                            rolId: 2
-                        }
-                        await postUserRol(rolObjeto)
+    
+                    if (userRol.find((rol) => rol.rolId == 2) && !checkedProfe.checked) {
+                        await deleteUserRol(id, 2);
+                    } else if (!userRol.find((rol) => rol.rolId == 2) && checkedProfe.checked) {
+                        await postUserRol({ usuarioId: id, rolId: 2 });
                     }
-
-                    if (userRol.find((rol) => rol.rolId == 3) && checkedAlumno.checked == false) {
-                        //decir de eliminar rol alumno
-                        await deleteUserRol(id, 3)
-                    } else if (userRol.find((rol) => rol.rolId == 3) == undefined && checkedAlumno.checked == true) {
-                        //decir de añadir rol alumno
-                        const rolObjeto = {
-                            usuarioId: id,
-                            rolId: 3
-                        }
-                        await postUserRol(rolObjeto)
+    
+                    if (userRol.find((rol) => rol.rolId == 3) && !checkedAlumno.checked) {
+                        await deleteUserRol(id, 3);
+                    } else if (!userRol.find((rol) => rol.rolId == 3) && checkedAlumno.checked) {
+                        await postUserRol({ usuarioId: id, rolId: 3 });
                     }
-
-                    const userRolActualizado = await getUserRolByUserId(id)
-                    
-                    // si el usuairio tiene el rol de alumon no puede tener ni el de admin ni el de profesor
-
-                    if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 2)) {
-                        await deleteUserRol(id, 2)
-                    }else if (userRolActualizado.user.find(r => r.rolId == 3) && userRolActualizado.user.find(r => r.rolId == 1)) {
-                        await deleteUserRol(id, 1)
-                    }
-
-                    // si el usuario no tiene rol se le podrá el de alumno por defecto
-
-                    if (userRolActualizado.user.length == 0) {
-                        const rolObjeto = {
-                            usuarioId: id,
-                            rolId: 3
-                        }
-                        await postUserRol(rolObjeto)
-                    }
-
-                    const modal = new bootstrap.Modal(modalElement)
+    
+                    // Actualizar la fila en la tabla si es necesario
+                    const tabla = $('#Users').DataTable();
+                    const row = tabla.row(`[data-id="${id}"]`);
+                    row.data([
+                        row.data()[0], // Mantener el nombre
+                        row.data()[1], // Mantener el email
+                        row.data()[2], // Mantener las acciones
+                    ]).draw(false);
+    
+                    const modal = new bootstrap.Modal(modalElement);
                     modal.hide();
-                    location.reload()
                 } catch (error) {
-                    console.error('Error al confirmar la modificación:', error)
+                    console.error('Error al confirmar la modificación:', error);
                 }
             });
         }
