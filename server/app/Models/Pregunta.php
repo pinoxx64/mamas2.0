@@ -18,7 +18,7 @@ class Pregunta extends Model
     {
         return $this->hasMany(Respuesta::class, 'preguntaId');
     }
-    
+
     public function asignatura()
     {
         return $this->belongsTo(Asignatura::class, 'asignaturaId');
@@ -27,5 +27,15 @@ class Pregunta extends Model
     public function examen()
     {
         return $this->belongsToMany(Examen::class, 'examen_pregunta', 'preguntaId', 'examenId');
+    }
+
+    public function respuestasExamen()
+    {
+        return $this->hasMany(RespuestaExamen::class, 'preguntaId');
+    }
+
+    public function examenPregunta()
+    {
+        return $this->hasOne(ExamenPregunta::class, 'preguntaId');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AsignaturaAlumno;
 use App\Models\Examen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,13 +18,13 @@ class ExamenController extends Controller
     }
 
     public function getExamenById($id){
-        $examen = Examen::find($id);
+        $examen = Examen::with(['preguntas.respuestas'])->find($id);
 
         if (!$examen) {
-            return response()->json(['message' => 'examen don`t find'], 404);
+            return response()->json(['message' => 'Examen no encontrado'], 404);
         }
-
-        return response()->json(['examen' => $examen]);
+    
+        return response()->json(['examen' => $examen], Response::HTTP_OK);
     }
 
     public function getExamenByUsuarioId($id){
@@ -97,5 +98,58 @@ class ExamenController extends Controller
         $examen->save();
 
         return response()->json(['examen' => $examen], Response::HTTP_OK);
+    }
+
+    public function getExamenActiveWithPreguntasByUserId($id){
+        $asignaturasUsuario = AsignaturaAlumno::where('usuarioId', $id)->pluck('asignaturaId');
+
+        if ($asignaturasUsuario->isEmpty()) {
+            return response()->json(['message' => 'El usuario no tiene asignaturas asociadas'], 404);
+        }
+    
+        $examenes = Examen::whereIn('asignaturaId', $asignaturasUsuario)
+            ->where('active', 1)
+            ->with(['preguntas.respuestas', 'asignatura'])
+            ->get();
+    
+        if ($examenes->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron exámenes activos para las asignaturas del usuario'], 404);
+        }
+    
+        return response()->json(['examenes' => $examenes], Response::HTTP_OK);
+    }
+
+    public function getExamenWithInfo($usuarioId)
+    {
+        $examenes = Examen::where('usuarioId', $usuarioId)
+        ->with(['respuestasExamen.usuario', 'respuestasExamen.pregunta'])
+        ->get();
+
+    if ($examenes->isEmpty()) {
+        return response()->json(['message' => 'No se encontraron exámenes creados por este usuario'], 404);
+    }
+
+    $data = $examenes->map(function ($examen) {
+        return [
+            'examenId' => $examen->id,
+            'nombre' => $examen->nombre,
+            'usuarios' => $examen->respuestasExamen->groupBy('usuarioId')->map(function ($respuestasUsuario) {
+                return [
+                    'usuarioId' => $respuestasUsuario->first()->usuario->id,
+                    'usuarioNombre' => $respuestasUsuario->first()->usuario->name ?? 'Desconocido',
+                    'respuestas' => $respuestasUsuario->map(function ($respuesta) {
+                        return [
+                            'respuestaId' => $respuesta->id,
+                            'preguntaId' => $respuesta->preguntaId,
+                            'pregunta' => $respuesta->pregunta->pregunta ?? 'Pregunta no encontrada',
+                            'respuesta' => $respuesta->respuesta
+                        ];
+                    })
+                ];
+            })->values()
+        ];
+    });
+
+    return response()->json(['examenes' => $data], Response::HTTP_OK);
     }
 }

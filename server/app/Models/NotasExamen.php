@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ExamenPregunta extends Model
+class NotasExamen extends Model
 {
-    protected $table = 'examen_pregunta';
+    protected $table = 'nota_examen';
     protected $fillable = [
         'examenId',
-        'preguntaId',
-        'puntuacion'
+        'usuarioId',
+        'nota',
     ];
+
     public function examen()
     {
         return $this->belongsTo(Examen::class, 'examenId');
-    }
-    public function pregunta()
-    {
-        return $this->belongsTo(Pregunta::class, 'preguntaId');
     }
 }

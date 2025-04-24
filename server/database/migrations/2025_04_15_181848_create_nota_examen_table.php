@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('examen_pregunta', function (Blueprint $table) {
+        Schema::create('nota_examen', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('examenId');
-            $table->unsignedBigInteger('preguntaId');
-            $table->float('puntuacion')->default(1);
+            $table->unsignedBigInteger('usuarioId');
+            $table->decimal('nota')->default(0.00);
             $table->timestamps();
 
             $table->foreign('examenId')->references('id')->on('examen')->onDelete('cascade');
-            $table->foreign('preguntaId')->references('id')->on('pregunta')->onDelete('cascade');
+            $table->foreign('usuarioId')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('examen_pregunta');
+        Schema::dropIfExists('nota_examen');
     }
 };

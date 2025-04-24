@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             RespuestaSeeder::class,
             ExamenSeeder::class,
             ExamenPreguntaSeeder::class,
+            asignaturaAlumnoSeeder::class
         ]);
     }
 }
