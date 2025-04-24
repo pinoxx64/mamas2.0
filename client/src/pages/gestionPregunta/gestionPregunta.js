@@ -77,9 +77,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", ")
                         opciones = opciones.map(opcion => opcion.texto)
                         tipoPregunta = "opciones multiples"
-                    } else {
-                        alert("Debe seleccionar al menos una opción como respuesta.")
-                        return
                     }
                 } else {
                     respuesta = document.getElementById("respuesta").value

@@ -204,7 +204,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         const preguntas = await getPreguntasWithRespuestas()
 
         const preguntasExamen = []
-        // Cargar asignaturas en el select
         const asignaturaSelect = document.getElementById("asignaturaExamen")
         asignaturas.asignatura.forEach(asignatura => {
             const option = document.createElement("option")
@@ -213,14 +212,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             asignaturaSelect.appendChild(option)
         })
     
-        // Mostrar el modal de crear pregunta al hacer clic en "Añadir Pregunta"
         const mostrarCrearPreguntaBtn = document.getElementById("mostrarCrearPregunta")
         mostrarCrearPreguntaBtn.addEventListener("click", () => {
             const crearPreguntaModal = new bootstrap.Modal(document.getElementById("crearPreguntaModal"))
             crearPreguntaModal.show()
         })
     
-        // Mostrar/ocultar campos según el tipo de pregunta
         const tipoPreguntaSelect = document.getElementById("tipoPregunta")
         const opcionesContainer = document.getElementById("opcionesContainer")
         const respuestaContainer = document.getElementById("respuesta").parentElement
@@ -264,7 +261,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 let respuestaPregunta = null
                 let tipoPregunta = tipo
     
-                // Manejar preguntas con opciones
                 if (tipo === "opciones") {
                     const opcionesInputs = document.querySelectorAll("#opcionesCampos .input-group")
                     opciones = Array.from(opcionesInputs).map(opcionDiv => {
@@ -284,11 +280,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                         tipoPregunta = "opciones multiples"
                     }
                 } else {
-                    // Manejar preguntas de texto o número
                     respuestaPregunta = document.getElementById("respuesta").value
                 }
     
-                // Crear la pregunta
                 const nuevaPregunta = {
                     tipo: tipoPregunta,
                     pregunta,
@@ -299,7 +293,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.log("Nueva Pregunta:", nuevaPregunta)
                 const respuesta = await postPregunta(nuevaPregunta)
     
-                // Crear la respuesta asociada
                 const nuevaRespuesta = {
                     respuesta: respuestaPregunta,
                     preguntaId: respuesta.pregunta.id,
@@ -308,7 +301,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.log("Nueva Respuesta:", nuevaRespuesta)
                 await postRespuesta(nuevaRespuesta)
     
-                // Agregar la pregunta al examen
                 preguntasExamen.push(respuesta.pregunta.id)
                 document.getElementById("preguntasExamen").innerHTML += `
                     <li class="list-group-item">
@@ -317,11 +309,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                     </li>
                 `
     
-                // Cerrar el modal
                 const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"))
                 crearPreguntaModal.hide()
     
-                // Limpiar los campos del formulario
                 document.getElementById("pregunta").value = ""
                 document.getElementById("respuesta").value = ""
                 opcionesCampos.innerHTML = `
@@ -336,7 +326,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         })
     
-        // Mostrar contenedor para importar preguntas
         const mostrarImportarPreguntasBtn = document.getElementById("mostrarImportarPreguntas")
         const importarPreguntasContainer = document.getElementById("importarPreguntasContainer")
         const listaPreguntas = document.getElementById("listaPreguntas")
@@ -377,7 +366,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
             }
         })
-        // Guardar examen
         const guardarExamenBtn = document.getElementById("guardarExamenBtn")
         guardarExamenBtn.addEventListener("click", async () => {
             try {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,20 @@ class AuthController extends Controller
                 'rolId' => 3,
             ]);
 
+            // correo
+            $datos = [
+                'userName' => $user->name,
+                'email' => $user->email
+            ];
+
+            $email = $user->email;
+
+            Mail::send('registro', $datos, function($message) use ($email)
+            {
+                $message->to($email)->subject('Ejemplo de envío');
+                $message->from('correoprofesionalmamas@gmail.com', 'Mamas Oficial');
+            });
+
             return response()->json([
                 "success" => true,
                 "data" => [
@@ -54,6 +69,7 @@ class AuthController extends Controller
                     'active' => $user->active,
                 ],
                 "message" => "Usuario registrado correctamente",
+
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error en el registro: ' . $e->getMessage()], 500);

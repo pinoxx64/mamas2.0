@@ -25,8 +25,14 @@ class Examen extends Model
     {
         return $this->belongsTo(Asignatura::class, 'asignaturaId');
     }
+    
     public function usuario()
     {
         return $this->belongsTo(User::class, 'usuarioId');
+    }
+
+    public function respuestasExamen()
+    {
+        return $this->hasMany(RespuestaExamen::class, 'examenId');
     }
 }
