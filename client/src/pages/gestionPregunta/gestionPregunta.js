@@ -121,26 +121,62 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Función para rellenar la tabla de preguntas
 
+    // async function rellenarPreguntas() {
+    //     const preguntasWithRespuestas = await getPreguntasWithRespuestas()
+    //     console.log(preguntasWithRespuestas.preguntas)
+    //     const preguntas = preguntasWithRespuestas.preguntas
+
+    //     const tabla = $('#Preguntas').DataTable()
+    //     tabla.clear().draw()
+    //     preguntas.forEach(pre => {
+    //         let respuestas = ''
+    //         pre.respuestas.forEach(res => {
+    //             respuestas += res.respuesta + '<br>'
+    //         })
+
+    //         let opciones = ''
+    //         if (pre.opciones) {
+    //             opciones = pre.opciones.replace(/\\n/g, ', ')
+    //         } else {
+    //             opciones = 'No tiene opciones'
+    //         }
+
+    //         const row = tabla.row.add([
+    //             pre.tipo,
+    //             pre.pregunta,
+    //             opciones,
+    //             pre.asignatura,
+    //             respuestas,
+    //             `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${pre.id}"><i class="fas fa-edit"></i> Editar</button>`
+    //         ]).draw()
+
+    //         document.body.insertAdjacentHTML('beforeend', editarPreguntaModal(pre, asignaturas))
+    //         editarPreguntaUI(pre)
+
+    //         row.nodes().to$().data('Preguntas', pre)
+    //     })
+    // }
+
     async function rellenarPreguntas() {
-        const preguntasWithRespuestas = await getPreguntasWithRespuestas()
-        console.log(preguntasWithRespuestas.preguntas)
-        const preguntas = preguntasWithRespuestas.preguntas
-
-        const tabla = $('#Preguntas').DataTable()
-        tabla.clear().draw()
+        const preguntasWithRespuestas = await getPreguntasWithRespuestas();
+        console.log(preguntasWithRespuestas.preguntas);
+        const preguntas = preguntasWithRespuestas.preguntas;
+    
+        const tabla = $('#Preguntas').DataTable();
+        tabla.clear().draw();
         preguntas.forEach(pre => {
-            let respuestas = ''
+            let respuestas = '';
             pre.respuestas.forEach(res => {
-                respuestas += res.respuesta + '<br>'
-            })
-
-            let opciones = ''
+                respuestas += res.respuesta + '<br>';
+            });
+    
+            let opciones = '';
             if (pre.opciones) {
-                opciones = pre.opciones.replace(/\\n/g, ', ')
+                opciones = pre.opciones.replace(/\n/g, ', ');
             } else {
-                opciones = 'No tiene opciones'
+                opciones = 'No tiene opciones';
             }
-
+    
             const row = tabla.row.add([
                 pre.tipo,
                 pre.pregunta,
@@ -148,13 +184,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 pre.asignatura,
                 respuestas,
                 `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${pre.id}"><i class="fas fa-edit"></i> Editar</button>`
-            ]).draw()
-
-            document.body.insertAdjacentHTML('beforeend', editarPreguntaModal(pre, asignaturas))
-            editarPreguntaUI(pre)
-
-            row.nodes().to$().data('Preguntas', pre)
-        })
+            ]).draw(false).node();
+    
+            $(row).attr('data-id', pre.id);
+    
+            document.body.insertAdjacentHTML('beforeend', editarPreguntaModal(pre, asignaturas));
+            editarPreguntaUI(pre);
+        });
     }
 
     // Funcion para crear el modal para editar la pregunta
@@ -226,23 +262,105 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Funcion que controla el evento de editar la pregunta
 
+    // async function editarPreguntaUI(pre) {
+    //     const modificarBtn = document.getElementById(`guardarBtn${pre.id}`)
+    
+    //     if (modificarBtn) {
+    //         modificarBtn.addEventListener('click', async () => {
+    //             try {
+    //                 const modalElement = document.getElementById(`myModal${pre.id}`)
+    //                 const tipo = document.getElementById(`tipo${pre.id}`).value
+    //                 const pregunta = document.getElementById(`pregunta${pre.id}`).value
+    //                 const asignaturaId = document.getElementById(`asignatura${pre.id}`).value
+    //                 const respuestaInput = document.getElementById(`respuesta${pre.id}`).value
+    //                 let opciones = document.getElementById(`opciones${pre.id}`).value
+    
+    //                 console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones)
+    
+    //                 if (tipo === 'texto' || tipo === 'números') {
+    //                     opciones = null
+    //                 }
+    
+    //                 const preguntaCambiada = {
+    //                     tipo: tipo,
+    //                     pregunta: pregunta,
+    //                     asignaturaId: asignaturaId,
+    //                     opciones: opciones,
+    //                 }
+    //                 console.log("Pregunta actualizada:", preguntaCambiada)
+    //                 await putPregunta(pre.id, preguntaCambiada)
+    
+    //                 if (tipo === 'opciones multiples' || tipo === 'opciones individuales') {
+    //                     const respuestas = respuestaInput.split(',').map(res => res.trim())
+    
+    //                     for (let i = 0; i < pre.respuestas.length; i++) {
+    //                         const respuestaExistente = pre.respuestas[i]
+    //                         if (respuestas[i]) {
+    //                             const respuestaCambiada = {
+    //                                 respuesta: respuestas[i],
+    //                                 preguntaId: pre.id,
+    //                             }
+    //                             console.log("Respuesta actualizada:", respuestaCambiada)
+    //                             await putRespuesta(respuestaExistente.id, respuestaCambiada)
+    //                         } else {
+    //                             console.log("Eliminando respuesta:", respuestaExistente.id)
+    //                             await deleteRespuesta(respuestaExistente.id)
+    //                         }
+    //                     }
+    
+    //                     for (let i = pre.respuestas.length; i < respuestas.length; i++) {
+    //                         const nuevaRespuesta = {
+    //                             respuesta: respuestas[i],
+    //                             preguntaId: pre.id,
+    //                         }
+    //                         console.log("Nueva respuesta:", nuevaRespuesta)
+    //                         await postRespuesta(nuevaRespuesta)
+    //                     }
+    //                 } else {
+    //                     if (pre.respuestas.length > 0) {
+    //                         const respuestaCambiada = {
+    //                             respuesta: respuestaInput,
+    //                             preguntaId: pre.id,
+    //                         }
+    //                         console.log("Respuesta actualizada:", respuestaCambiada)
+    //                         await putRespuesta(pre.respuestas[0].id, respuestaCambiada)
+    //                     } else {
+    //                         const nuevaRespuesta = {
+    //                             respuesta: respuestaInput,
+    //                             preguntaId: pre.id,
+    //                         }
+    //                         console.log("Nueva respuesta:", nuevaRespuesta)
+    //                         await postRespuesta(nuevaRespuesta)
+    //                     }
+    //                 }
+    
+    //                 const modal = new bootstrap.Modal(modalElement)
+    //                 modal.hide()
+    //                 location.reload()
+    //             } catch (error) {
+    //                 console.error('Error al confirmar la modificación:', error)
+    //             }
+    //         })
+    //     }
+    // }
+
     async function editarPreguntaUI(pre) {
-        const modificarBtn = document.getElementById(`guardarBtn${pre.id}`)
+        const modificarBtn = document.getElementById(`guardarBtn${pre.id}`);
     
         if (modificarBtn) {
             modificarBtn.addEventListener('click', async () => {
                 try {
-                    const modalElement = document.getElementById(`myModal${pre.id}`)
-                    const tipo = document.getElementById(`tipo${pre.id}`).value
-                    const pregunta = document.getElementById(`pregunta${pre.id}`).value
-                    const asignaturaId = document.getElementById(`asignatura${pre.id}`).value
-                    const respuestaInput = document.getElementById(`respuesta${pre.id}`).value
-                    let opciones = document.getElementById(`opciones${pre.id}`).value
+                    const modalElement = document.getElementById(`myModal${pre.id}`);
+                    const tipo = document.getElementById(`tipo${pre.id}`).value;
+                    const pregunta = document.getElementById(`pregunta${pre.id}`).value;
+                    const asignaturaId = document.getElementById(`asignatura${pre.id}`).value;
+                    const respuestaInput = document.getElementById(`respuesta${pre.id}`).value;
+                    let opciones = document.getElementById(`opciones${pre.id}`).value;
     
-                    console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones)
+                    console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones);
     
                     if (tipo === 'texto' || tipo === 'números') {
-                        opciones = null
+                        opciones = null;
                     }
     
                     const preguntaCambiada = {
@@ -250,25 +368,26 @@ document.addEventListener("DOMContentLoaded", async function () {
                         pregunta: pregunta,
                         asignaturaId: asignaturaId,
                         opciones: opciones,
-                    }
-                    console.log("Pregunta actualizada:", preguntaCambiada)
-                    await putPregunta(pre.id, preguntaCambiada)
+                    };
+    
+                    console.log("Pregunta actualizada:", preguntaCambiada);
+                    await putPregunta(pre.id, preguntaCambiada);
     
                     if (tipo === 'opciones multiples' || tipo === 'opciones individuales') {
-                        const respuestas = respuestaInput.split(',').map(res => res.trim())
+                        const respuestas = respuestaInput.split(',').map(res => res.trim());
     
                         for (let i = 0; i < pre.respuestas.length; i++) {
-                            const respuestaExistente = pre.respuestas[i]
+                            const respuestaExistente = pre.respuestas[i];
                             if (respuestas[i]) {
                                 const respuestaCambiada = {
                                     respuesta: respuestas[i],
                                     preguntaId: pre.id,
-                                }
-                                console.log("Respuesta actualizada:", respuestaCambiada)
-                                await putRespuesta(respuestaExistente.id, respuestaCambiada)
+                                };
+                                console.log("Respuesta actualizada:", respuestaCambiada);
+                                await putRespuesta(respuestaExistente.id, respuestaCambiada);
                             } else {
-                                console.log("Eliminando respuesta:", respuestaExistente.id)
-                                await deleteRespuesta(respuestaExistente.id)
+                                console.log("Eliminando respuesta:", respuestaExistente.id);
+                                await deleteRespuesta(respuestaExistente.id);
                             }
                         }
     
@@ -276,35 +395,58 @@ document.addEventListener("DOMContentLoaded", async function () {
                             const nuevaRespuesta = {
                                 respuesta: respuestas[i],
                                 preguntaId: pre.id,
-                            }
-                            console.log("Nueva respuesta:", nuevaRespuesta)
-                            await postRespuesta(nuevaRespuesta)
+                            };
+                            console.log("Nueva respuesta:", nuevaRespuesta);
+                            await postRespuesta(nuevaRespuesta);
                         }
                     } else {
                         if (pre.respuestas.length > 0) {
                             const respuestaCambiada = {
                                 respuesta: respuestaInput,
                                 preguntaId: pre.id,
-                            }
-                            console.log("Respuesta actualizada:", respuestaCambiada)
-                            await putRespuesta(pre.respuestas[0].id, respuestaCambiada)
+                            };
+                            console.log("Respuesta actualizada:", respuestaCambiada);
+                            await putRespuesta(pre.respuestas[0].id, respuestaCambiada);
                         } else {
                             const nuevaRespuesta = {
                                 respuesta: respuestaInput,
                                 preguntaId: pre.id,
-                            }
-                            console.log("Nueva respuesta:", nuevaRespuesta)
-                            await postRespuesta(nuevaRespuesta)
+                            };
+                            console.log("Nueva respuesta:", nuevaRespuesta);
+                            await postRespuesta(nuevaRespuesta);
                         }
                     }
     
-                    const modal = new bootstrap.Modal(modalElement)
-                    modal.hide()
-                    location.reload()
+                    // Actualizar la fila en la tabla
+                    const tabla = $('#Preguntas').DataTable();
+                    const row = tabla.row(`[data-id="${pre.id}"]`);
+    
+                    if (!row.node()) {
+                        console.error(`No se encontró la fila con id: ${pre.id}`);
+                        return;
+                    }
+    
+                    const respuestas = respuestaInput.split(',').map(res => res.trim()).join('<br>');
+                    const opcionesTexto = opciones ? opciones.replace(/\n/g, ', ') : 'No tiene opciones';
+    
+                    row.data([
+                        tipo,
+                        pregunta,
+                        opcionesTexto,
+                        asignaturaId,
+                        respuestas,
+                        row.data()[5],
+                    ]).draw(false);
+    
+                    // Cerrar el modal correctamente
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
                 } catch (error) {
-                    console.error('Error al confirmar la modificación:', error)
+                    console.error('Error al confirmar la modificación:', error);
                 }
-            })
+            });
         }
     }
 

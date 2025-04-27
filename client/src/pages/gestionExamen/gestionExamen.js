@@ -31,12 +31,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${examen.id}"><i class="fas fa-edit"></i> Desactivar examen</button>
                     <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examen.id}">Ver preguntas</button>
                     `
-                ]).draw()
+                ]).draw(false).node();
 
                 document.body.insertAdjacentHTML('beforeend', deleteExamen(examen))
                 activeOrDesableExamenUI(examen.id, 'disable')
 
                 document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
+
+                $(row).attr('data-id', examen.id);
             } else {
 
                 // La tabla que se ve cuando el usuario está desactivo
@@ -51,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${examen.id}"><i class="fas fa-edit"></i> Activar examen</button>
                     <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examen.id}">Ver preguntas</button>
                     `
-                ]).draw()
+                ]).draw(false).node();
 
                 document.body.insertAdjacentHTML('beforeend', activeExamen(examen))
                 activeOrDesableExamenUI(examen.id, 'active')
@@ -62,9 +64,47 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.body.insertAdjacentHTML('beforeend', editarExamenModal(examen))
                 editarExamenUI(examen)
 
+                $(row).attr('data-id', examen.id);
             }
         })
     }
+    //     const examenes = await getExamen();
+    //     console.log("Exámenes obtenidos:", examenes);
+    
+    //     const tabla = $('#Examenes').DataTable();
+    //     tabla.clear().draw();
+    
+    //     examenes.examenes.forEach(examen => {
+    //         const asignatura = asignaturas.asignatura.find(asig => asig.id === examen.asignaturaId)?.nombre || "Sin asignatura";
+    
+    //         const row = tabla.row.add([
+    //             examen.nombre,
+    //             examen.fhInicio,
+    //             examen.fhFinal,
+    //             asignatura,
+    //             examen.active == 1
+    //                 ? `
+    //                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${examen.id}"><i class="fas fa-edit"></i> Desactivar examen</button>
+    //                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examen.id}">Ver preguntas</button>
+    //                 `
+    //                 : `
+    //                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editarExamenModal${examen.id}"><i class="fas fa-edit"></i> Editar examen</button>
+    //                 <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${examen.id}"><i class="fas fa-edit"></i> Activar examen</button>
+    //                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examen.id}">Ver preguntas</button>
+    //                 `
+    //         ]).draw(false).node();
+    
+    //         $(row).attr('data-id', examen.id);
+    
+    //         document.body.insertAdjacentHTML('beforeend', deleteExamen(examen));
+    //         document.body.insertAdjacentHTML('beforeend', activeExamen(examen));
+    //         document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen));
+    //         document.body.insertAdjacentHTML('beforeend', editarExamenModal(examen));
+    
+    //         activeOrDesableExamenUI(examen.id, examen.active == 1 ? 'disable' : 'active');
+    //         editarExamenUI(examen);
+    //     });
+    // }
 
     // Funcion para crear el modal para activar el examen
 
@@ -401,43 +441,76 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function activeOrDesableExamenUI(id, estado) {
-        const confirmarActiveOrDesable = document.getElementById(`confirmarActiveOrDesable${id}`)
-
+        const confirmarActiveOrDesable = document.getElementById(`confirmarActiveOrDesable${id}`);
+    
         if (confirmarActiveOrDesable) {
             confirmarActiveOrDesable.addEventListener('click', async () => {
                 try {
-                    await activeOrDesableExamen(id)
-
-                    if (estado == 'active') {
-                        const modalElement = document.getElementById(`activeModal${id}`)
-                        const modal = new bootstrap.Modal(modalElement)
-                        modal.hide()
-                    } else {
-                        const modalElement2 = document.getElementById(`deleteModal${id}`)
-                        console.log(modalElement2)
-                        const modal2 = new bootstrap.Modal(modalElement2)
-                        modal2.hide()
+                    await activeOrDesableExamen(id);
+    
+                    const tabla = $('#Examenes').DataTable();
+                    const row = tabla.row(`[data-id="${id}"]`);
+    
+                    if (!row.node()) {
+                        console.error(`No se encontró la fila con id: ${id}`);
+                        return;
                     }
-                    location.reload()
-
+    
+                    const rowData = row.data();
+                    if (!rowData || rowData.length < 5) {
+                        console.error(`Los datos de la fila son inválidos:`, rowData);
+                        return;
+                    }
+    
+                    if (estado === 'active') {
+                        row.data([
+                            rowData[0],
+                            rowData[1],
+                            rowData[2],
+                            rowData[3],
+                            `
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${id}"><i class="fas fa-edit"></i> Desactivar examen</button>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
+                            `
+                        ]).draw(false);
+                    } else {
+                        row.data([
+                            rowData[0],
+                            rowData[1],
+                            rowData[2],
+                            rowData[3], 
+                            `
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editarExamenModal${id}"><i class="fas fa-edit"></i> Editar examen</button>
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${id}"><i class="fas fa-edit"></i> Activar examen</button>
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
+                            `
+                        ]).draw(false);
+                    }
+    
+                    const modalElement = document.getElementById(estado === 'active' ? `activeModal${id}` : `deleteModal${id}`);
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    if (modal) {
+                        modal.hide();
+                    }
                 } catch (error) {
-                    console.error('Error al confirmar la activación/desactivación:', error)
+                    console.error('Error al confirmar la activación/desactivación:', error);
                 }
-            })
+            });
         }
     }
 
-    function editarExamenUI(examen) {
-        const modalHtml = editarExamenModal(examen)
-        document.body.insertAdjacentHTML("beforeend", modalHtml)
 
-        const guardarCambiosBtn = document.getElementById(`guardarCambiosExamen${examen.id}`)
+    function editarExamenUI(examen) {
+        const modalHtml = editarExamenModal(examen);
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+    
+        const guardarCambiosBtn = document.getElementById(`guardarCambiosExamen${examen.id}`);
         guardarCambiosBtn.addEventListener("click", async () => {
             try {
-                const nombre = document.getElementById(`nombreExamen${examen.id}`).value
-                const fhInicio = document.getElementById(`fechaInicio${examen.id}`).value
-                const fhFinal = document.getElementById(`fechaFin${examen.id}`).value
-
+                const nombre = document.getElementById(`nombreExamen${examen.id}`).value;
+                const fhInicio = document.getElementById(`fechaInicio${examen.id}`).value;
+                const fhFinal = document.getElementById(`fechaFin${examen.id}`).value;
+    
                 const datosActualizados = {
                     nombre,
                     fhInicio,
@@ -445,16 +518,40 @@ document.addEventListener("DOMContentLoaded", async function () {
                     usuarioId: examen.usuarioId,
                     asignaturaId: examen.asignaturaId,
                     active: examen.active,
+                };
+    
+                console.log("Datos actualizados del examen:", datosActualizados);
+    
+                await putExamen(examen.id, datosActualizados);
+    
+                // Actualizar la fila en la tabla
+                const tabla = $('#Examenes').DataTable();
+                const row = tabla.row(`[data-id="${examen.id}"]`);
+    
+                if (!row.node()) {
+                    console.error(`No se encontró la fila con id: ${examen.id}`);
+                    return;
                 }
-
-                console.log("Datos actualizados del examen:", datosActualizados)
-
-                await putExamen(examen.id, datosActualizados)
-                location.reload()
+    
+                const asignaturaNombre = asignaturas.asignatura.find(asig => asig.id === examen.asignaturaId)?.nombre || "Sin asignatura";
+    
+                row.data([
+                    nombre,
+                    fhInicio,
+                    fhFinal,
+                    asignaturaNombre,
+                    row.data()[4], // Mantener las acciones sin cambios
+                ]).draw(false);
+    
+                const modalElement = document.getElementById(`editarExamenModal${examen.id}`);
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
             } catch (error) {
-                console.error("Error al actualizar el examen:", error)
+                console.error("Error al actualizar el examen:", error);
             }
-        })
+        });
     }
 
     async function mostrarPreguntasExamen(examen) {
