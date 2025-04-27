@@ -269,7 +269,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         user.email,
                         `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${id}"><i class="fas fa-edit"></i> Editar</button>` +
                         `<button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${id}" ><i class="fas fa-trash-alt"></i> Añadir</button>`,
-                    ]).draw(false);
+                    ]).draw(false).node();
+    
+                    $(row).attr('data-id', id);
+        
+                    document.body.insertAdjacentHTML('beforeend', editarUserModal(user));
+                    editarUserUI(userWithUserRols, id);
+                    document.body.insertAdjacentHTML('beforeend', anadirUserModal(user));
+                    anadirUserUI(userWithUserRols, id);
     
                     const modalElement = document.getElementById(`deleteModal${id}`);
                     const modal = new bootstrap.Modal(modalElement);
@@ -307,7 +314,34 @@ document.addEventListener("DOMContentLoaded", function () {
                         `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${id}"><i class="fas fa-edit"></i> Editar</button>` +
                         `<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${id}" ><i class="fas fa-trash-alt"></i> Eliminar</button>` +
                         `<button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rolModal${id}" ><i class="fas fa-trash-alt"></i> Roles</button>`,
-                    ]).draw(false);
+                    ]).draw(false).node();
+    
+                    $(row).attr('data-id', id);
+        
+                    document.body.insertAdjacentHTML('beforeend', editarUserModal(user));
+                    editarUserUI(userWithUserRols, id);
+                    document.body.insertAdjacentHTML('beforeend', deleteUserModal(user));
+                    eliminarUserUI(userWithUserRols, id);
+                    document.body.insertAdjacentHTML('beforeend', editarRolModal(user));
+                    editarRolesUI(userWithUserRols, id);
+
+                    const meterProfesor = document.getElementById(`profe${id}`)
+                    const meterAlumno = document.getElementById(`alum${id}`)
+                    const meterAdmin = document.getElementById(`admin${id}`)
+    
+                    for (let i = 0; i < user.length; i++) {
+                        if (user[i].usuarioId == id && user[i].rolId == 1) {
+                            meterAdmin.checked = true
+                        }
+    
+                        if (user[i].usuarioId == id && user[i].rolId == 2) {
+                            meterProfesor.checked = true
+                        }
+    
+                        if (user[i].usuarioId == id && user[i].rolId == 3) {
+                            meterAlumno.checked = true
+                        }
+                    }
     
                     const modalElement = document.getElementById(`activeModal${id}`);
                     const modal = new bootstrap.Modal(modalElement);
