@@ -291,80 +291,162 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     
         const guardarPreguntaBtn = document.getElementById("guardarPregunta")
+        // guardarPreguntaBtn.addEventListener("click", async () => {
+        //     try {
+        //         const tipo = document.getElementById("tipoPregunta").value
+        //         const pregunta = document.getElementById("pregunta").value
+        //         const asignaturaId = document.getElementById("asignaturaExamen").value
+    
+        //         let opciones = []
+        //         let respuestaPregunta = null
+        //         let tipoPregunta = tipo
+    
+        //         if (tipo === "opciones") {
+        //             const opcionesInputs = document.querySelectorAll("#opcionesCampos .input-group")
+        //             opciones = Array.from(opcionesInputs).map(opcionDiv => {
+        //                 const texto = opcionDiv.querySelector("input[type='text']").value
+        //                 const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked
+        //                 return { texto, seleccionado }
+        //             })
+    
+        //             const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado)
+        //             if (opcionesSeleccionadas.length === 1) {
+        //                 respuestaPregunta = opcionesSeleccionadas[0].texto
+        //                 opciones = opciones.map(opcion => opcion.texto)
+        //                 tipoPregunta = "opciones individuales"
+        //             } else if (opcionesSeleccionadas.length > 1) {
+        //                 respuestaPregunta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ")
+        //                 opciones = opciones.map(opcion => opcion.texto)
+        //                 tipoPregunta = "opciones multiples"
+        //             }
+        //         } else {
+        //             respuestaPregunta = document.getElementById("respuesta").value
+        //         }
+    
+        //         const nuevaPregunta = {
+        //             tipo: tipoPregunta,
+        //             pregunta,
+        //             asignaturaId,
+        //             opciones: opciones.length > 0 ? opciones.join("\n") : null,
+        //         }
+    
+        //         console.log("Nueva Pregunta:", nuevaPregunta)
+        //         const respuesta = await postPregunta(nuevaPregunta)
+    
+        //         const nuevaRespuesta = {
+        //             respuesta: respuestaPregunta,
+        //             preguntaId: respuesta.pregunta.id,
+        //         }
+    
+        //         console.log("Nueva Respuesta:", nuevaRespuesta)
+        //         await postRespuesta(nuevaRespuesta)
+    
+        //         preguntasExamen.push(respuesta.pregunta.id)
+        //         document.getElementById("preguntasExamen").innerHTML += `
+        //             <li class="list-group-item">
+        //                 <strong>Pregunta:</strong> ${pregunta}
+        //                 ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
+        //             </li>
+        //         `
+    
+        //         const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"))
+        //         crearPreguntaModal.hide()
+    
+        //         document.getElementById("pregunta").value = ""
+        //         document.getElementById("respuesta").value = ""
+        //         opcionesCampos.innerHTML = `
+        //             <div class="input-group mb-2">
+        //                 <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
+        //                 <input type="text" class="form-control" placeholder="Escribe una opción">
+        //             </div>
+        //         `
+        //         opcionesContainer.classList.add("d-none")
+        //     } catch (error) {
+        //         console.error("Error al guardar la pregunta:", error)
+        //     }
+        // })
+
         guardarPreguntaBtn.addEventListener("click", async () => {
             try {
-                const tipo = document.getElementById("tipoPregunta").value
-                const pregunta = document.getElementById("pregunta").value
-                const asignaturaId = document.getElementById("asignaturaExamen").value
-    
-                let opciones = []
-                let respuestaPregunta = null
-                let tipoPregunta = tipo
-    
+                const tipo = document.getElementById("tipoPregunta").value;
+                const pregunta = document.getElementById("pregunta").value;
+                const asignaturaId = document.getElementById("asignaturaExamen").value;
+        
+                let opciones = [];
+                let respuestaPregunta = null;
+                let tipoPregunta = tipo;
+        
                 if (tipo === "opciones") {
-                    const opcionesInputs = document.querySelectorAll("#opcionesCampos .input-group")
+                    const opcionesInputs = document.querySelectorAll("#opcionesCampos .input-group");
                     opciones = Array.from(opcionesInputs).map(opcionDiv => {
-                        const texto = opcionDiv.querySelector("input[type='text']").value
-                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked
-                        return { texto, seleccionado }
-                    })
-    
-                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado)
+                        const texto = opcionDiv.querySelector("input[type='text']").value;
+                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
+                        return { texto, seleccionado };
+                    });
+        
+                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
                     if (opcionesSeleccionadas.length === 1) {
-                        respuestaPregunta = opcionesSeleccionadas[0].texto
-                        opciones = opciones.map(opcion => opcion.texto)
-                        tipoPregunta = "opciones individuales"
+                        respuestaPregunta = opcionesSeleccionadas[0].texto;
+                        opciones = opciones.map(opcion => opcion.texto);
+                        tipoPregunta = "opciones individuales";
                     } else if (opcionesSeleccionadas.length > 1) {
-                        respuestaPregunta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ")
-                        opciones = opciones.map(opcion => opcion.texto)
-                        tipoPregunta = "opciones multiples"
+                        respuestaPregunta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ");
+                        opciones = opciones.map(opcion => opcion.texto);
+                        tipoPregunta = "opciones multiples";
                     }
                 } else {
-                    respuestaPregunta = document.getElementById("respuesta").value
+                    respuestaPregunta = document.getElementById("respuesta").value;
                 }
-    
+        
                 const nuevaPregunta = {
                     tipo: tipoPregunta,
                     pregunta,
                     asignaturaId,
                     opciones: opciones.length > 0 ? opciones.join("\n") : null,
-                }
-    
-                console.log("Nueva Pregunta:", nuevaPregunta)
-                const respuesta = await postPregunta(nuevaPregunta)
-    
+                };
+        
+                console.log("Nueva Pregunta:", nuevaPregunta);
+                const respuesta = await postPregunta(nuevaPregunta);
+        
                 const nuevaRespuesta = {
                     respuesta: respuestaPregunta,
                     preguntaId: respuesta.pregunta.id,
-                }
-    
-                console.log("Nueva Respuesta:", nuevaRespuesta)
-                await postRespuesta(nuevaRespuesta)
-    
-                preguntasExamen.push(respuesta.pregunta.id)
+                };
+        
+                console.log("Nueva Respuesta:", nuevaRespuesta);
+                await postRespuesta(nuevaRespuesta);
+        
+                preguntasExamen.push({ id: respuesta.pregunta.id, puntuacion: 0 });
+        
                 document.getElementById("preguntasExamen").innerHTML += `
-                    <li class="list-group-item">
-                        <strong>Pregunta:</strong> ${pregunta}
-                        ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${tipoPregunta}:</strong> ${pregunta}
+                            ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label for="puntuacion-${respuesta.pregunta.id}" class="me-2">Puntuación:</label>
+                            <input type="number" class="form-control puntuacion-input" id="puntuacion-${respuesta.pregunta.id}" data-id="${respuesta.pregunta.id}" value="1" min="0" style="width: 80px;">
+                        </div>
                     </li>
-                `
-    
-                const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"))
-                crearPreguntaModal.hide()
-    
-                document.getElementById("pregunta").value = ""
-                document.getElementById("respuesta").value = ""
+                `;
+        
+                const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"));
+                crearPreguntaModal.hide();
+        
+                document.getElementById("pregunta").value = "";
+                document.getElementById("respuesta").value = "";
                 opcionesCampos.innerHTML = `
                     <div class="input-group mb-2">
                         <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
                         <input type="text" class="form-control" placeholder="Escribe una opción">
                     </div>
-                `
-                opcionesContainer.classList.add("d-none")
+                `;
+                opcionesContainer.classList.add("d-none");
             } catch (error) {
-                console.error("Error al guardar la pregunta:", error)
+                console.error("Error al guardar la pregunta:", error);
             }
-        })
+        });
     
         const mostrarImportarPreguntasBtn = document.getElementById("mostrarImportarPreguntas")
         const importarPreguntasContainer = document.getElementById("importarPreguntasContainer")
@@ -385,36 +467,96 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         })
     
+        // listaPreguntas.addEventListener("click", async (e) => {
+        //     e.preventDefault()
+        
+        //     if (e.target.classList.contains("seleccionarPregunta")) {
+        //         const preguntaId = e.target.getAttribute("data-id")
+        //         const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId)
+        
+        //         if (preguntaSeleccionada) {
+        //             preguntasExamen.push(preguntaSeleccionada.id)
+        
+        //             document.getElementById("preguntasExamen").innerHTML += `
+        //                 <li class="list-group-item">
+        //                     <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
+        //                     ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
+        //                 </li>
+        //             `
+        
+        //             importarPreguntasContainer.classList.add("d-none")
+        //         }
+        //     }
+        // })
         listaPreguntas.addEventListener("click", async (e) => {
-            e.preventDefault()
+            e.preventDefault();
         
             if (e.target.classList.contains("seleccionarPregunta")) {
-                const preguntaId = e.target.getAttribute("data-id")
-                const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId)
+                const preguntaId = e.target.getAttribute("data-id");
+                const preguntaSeleccionada = preguntas.preguntas.find(pregunta => pregunta.id == preguntaId);
         
                 if (preguntaSeleccionada) {
-                    preguntasExamen.push(preguntaSeleccionada.id)
+                    preguntasExamen.push({ id: preguntaSeleccionada.id, puntuacion: 0 });
         
                     document.getElementById("preguntasExamen").innerHTML += `
-                        <li class="list-group-item">
-                            <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
-                            ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${preguntaSeleccionada.tipo}:</strong> ${preguntaSeleccionada.pregunta}
+                                ${preguntaSeleccionada.opciones ? `<p><strong>Opciones:</strong> ${preguntaSeleccionada.opciones.replace(/\n/g, ', ')}</p>` : ""}
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <label for="puntuacion-${preguntaSeleccionada.id}" class="me-2">Puntuación:</label>
+                                <input type="number" class="form-control puntuacion-input" id="puntuacion-${preguntaSeleccionada.id}" data-id="${preguntaSeleccionada.id}" value="1" min="0" style="width: 80px;">
+                            </div>
                         </li>
-                    `
+                    `;
         
-                    importarPreguntasContainer.classList.add("d-none")
+                    importarPreguntasContainer.classList.add("d-none");
                 }
             }
-        })
+        });
+
         const guardarExamenBtn = document.getElementById("guardarExamenBtn")
+        // guardarExamenBtn.addEventListener("click", async () => {
+        //     try {
+        //         const nombre = document.getElementById("nombreExamen").value
+        //         const fhInicio = document.getElementById("fechaInicio").value
+        //         const fhFinal = document.getElementById("fechaFin").value
+        //         const asignaturaId = document.getElementById("asignaturaExamen").value
+        //         const creadorId = sessionStorage.getItem("userId")
+    
+        //         const nuevoExamen = {
+        //             nombre,
+        //             fhInicio,
+        //             fhFinal,
+        //             usuarioId: creadorId,
+        //             asignaturaId,
+        //             active: 0,
+        //         }
+        //         console.log("Nuevo Examen:", nuevoExamen)
+        //         const examenCreado = await postExamen(nuevoExamen)
+    
+        //         for (const preguntaId of preguntasExamen) {
+        //             await postExamenPregunta({
+        //                 examenId: examenCreado.examen.id,
+        //                 preguntaId: preguntaId,
+        //             })
+        //         }
+    
+        //         location.reload()
+        //     } catch (error) {
+        //         console.error("Error al guardar el examen:", error)
+        //     }
+        // })
+
         guardarExamenBtn.addEventListener("click", async () => {
             try {
-                const nombre = document.getElementById("nombreExamen").value
-                const fhInicio = document.getElementById("fechaInicio").value
-                const fhFinal = document.getElementById("fechaFin").value
-                const asignaturaId = document.getElementById("asignaturaExamen").value
-                const creadorId = sessionStorage.getItem("userId")
-    
+                const nombre = document.getElementById("nombreExamen").value;
+                const fhInicio = document.getElementById("fechaInicio").value;
+                const fhFinal = document.getElementById("fechaFin").value;
+                const asignaturaId = document.getElementById("asignaturaExamen").value;
+                const creadorId = sessionStorage.getItem("userId");
+        
                 const nuevoExamen = {
                     nombre,
                     fhInicio,
@@ -422,20 +564,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                     usuarioId: creadorId,
                     asignaturaId,
                     active: 0,
-                }
-                console.log("Nuevo Examen:", nuevoExamen)
-                const examenCreado = await postExamen(nuevoExamen)
-    
-                for (const preguntaId of preguntasExamen) {
+                };
+                console.log("Nuevo Examen:", nuevoExamen);
+                const examenCreado = await postExamen(nuevoExamen);
+        
+                const puntuacionesInputs = document.querySelectorAll(".puntuacion-input");
+                for (const input of puntuacionesInputs) {
+                    const preguntaId = input.getAttribute("data-id");
+                    const puntuacion = parseFloat(input.value);
+        
                     await postExamenPregunta({
                         examenId: examenCreado.examen.id,
                         preguntaId: preguntaId,
-                    })
+                        puntuacion: puntuacion,
+                    });
                 }
-    
-                location.reload()
+        
+                location.reload();
             } catch (error) {
-                console.error("Error al guardar el examen:", error)
+                console.error("Error al guardar el examen:", error);
             }
         })
     }

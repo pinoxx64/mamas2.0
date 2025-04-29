@@ -137,19 +137,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             const usuarioId = e.target.id.replace("finalizarCorreccion", "");
             const modal = document.getElementById(`corregirModal${usuarioId}`);
             const checkboxes = modal.querySelectorAll("input[type='checkbox']");
-            const resultados = Array.from(checkboxes).map((checkbox) => ({
-                respuestaId: checkbox.id.split("_")[1],
-                correcta: checkbox.checked,
-            }));
-    
             const examenId = modal.getAttribute("data-examen-id");
+    
+            const resultados = Array.from(checkboxes).map((checkbox) => {
+                const respuestaId = checkbox.id.split("_")[1];
+                const correcta = checkbox.checked;
+    
+                const puntuacionInput = modal.querySelector(`#puntuacion_${respuestaId}`);
+                const puntuacion = puntuacionInput ? parseFloat(puntuacionInput.value) || 0 : 0;
+    
+                return {
+                    respuestaId,
+                    correcta,
+                    puntuacion,
+                };
+            });
+    
             const payload = {
                 examenId,
                 usuarioId,
                 resultados,
             };
     
-            console.log("Resultados de la corrección:", payload);
+            console.log("Resultados de la corrección con puntuaciones:", payload);
             await calcularNotaYGuardar(payload);
     
             const bootstrapModal = bootstrap.Modal.getInstance(modal);
@@ -182,6 +192,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    // function corregirExamenModal(usuario, examenNombre, examenId) {
+    //     return `
+    //         <div class="modal" id="corregirModal${usuario.usuarioId}" data-examen-id="${examenId}">
+    //             <div class="modal-dialog modal-lg">
+    //                 <div class="modal-content">
+    //                     <div class="modal-header">
+    //                         <h5 class="modal-title">Corregir Examen: ${examenNombre} - ${usuario.usuarioNombre}</h5>
+    //                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    //                     </div>
+    //                     <div class="modal-body">
+    //                         ${usuario.respuestas.map((respuesta) => `
+    //                             <div class="mb-3">
+    //                                 <p>Pregunta: ${respuesta.pregunta}</p>
+    //                                 <p>Respuesta: ${respuesta.respuesta}</p>
+    //                                 <div class="form-check">
+    //                                     <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.respuestaId}">
+    //                                     <label class="form-check-label" for="respuesta_${respuesta.respuestaId}">Correcta</label>
+    //                                 </div>
+    //                             </div>
+    //                         `).join('')}
+    //                     </div>
+    //                     <div class="modal-footer">
+    //                         <button type="button" class="btn btn-success" id="finalizarCorreccion${usuario.usuarioId}">Finalizar corrección</button>
+    //                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     `;
+    // }
     function corregirExamenModal(usuario, examenNombre, examenId) {
         return `
             <div class="modal" id="corregirModal${usuario.usuarioId}" data-examen-id="${examenId}">
@@ -199,6 +239,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.respuestaId}">
                                         <label class="form-check-label" for="respuesta_${respuesta.respuestaId}">Correcta</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label for="puntuacion_${respuesta.respuestaId}" class="form-label">Puntuación:</label>
+                                        <input type="number" class="form-control" id="puntuacion_${respuesta.respuestaId}" value="${respuesta.puntuacion || 0}" min="0" step="0.1">
                                     </div>
                                 </div>
                             `).join('')}
