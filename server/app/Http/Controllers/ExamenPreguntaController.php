@@ -38,7 +38,8 @@ class ExamenPreguntaController extends Controller
     public function postExamenPregunta(Request $request){
         $validator = Validator::make($request->all(), [
             'examenId' => 'required|integer',
-            'preguntaId' => 'required|integer'
+            'preguntaId' => 'required|integer',
+            'puntuacion' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -46,7 +47,8 @@ class ExamenPreguntaController extends Controller
         }else{
             $examenPregunta = ExamenPregunta::create([
                 'examenId' => $request['examenId'],
-                'preguntaId' => $request['preguntaId']
+                'preguntaId' => $request['preguntaId'],
+                'puntuacion' => $request['puntuacion'],
             ]);
             return response()->json(['examenPregunta' => $examenPregunta], 201);
         }

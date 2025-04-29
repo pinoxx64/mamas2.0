@@ -1,4 +1,5 @@
 import { getExamenWithInfo } from "../../components/examenApi";
+import { getExamenPreguntaByExamenId } from "../../components/examenPreguntaApi";
 import { calcularNotaYGuardar, correguirAuto, correguirAutoTodo } from "../../components/notaExamenApi";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -138,13 +139,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             const modal = document.getElementById(`corregirModal${usuarioId}`);
             const checkboxes = modal.querySelectorAll("input[type='checkbox']");
             const examenId = modal.getAttribute("data-examen-id");
-    
+
+            const response = await getExamenPreguntaByExamenId(examenId);
+            const preguntas = response.examenPregunta;
+            console.log("Preguntas obtenidas:", preguntas);
+
             const resultados = Array.from(checkboxes).map((checkbox) => {
+                console.log("Checkbox:", checkbox);
                 const respuestaId = checkbox.id.split("_")[1];
                 const correcta = checkbox.checked;
     
-                const puntuacionInput = modal.querySelector(`#puntuacion_${respuestaId}`);
-                const puntuacion = puntuacionInput ? parseFloat(puntuacionInput.value) || 0 : 0;
+                console.log("Respuesta ID:", respuestaId);
+                console.log("Respuesta correcta:", correcta);
+                const pregunta = preguntas.find((p) => p.preguntaId == respuestaId);
+
+                const puntuacion = pregunta.puntuacion
+                console.log("Puntuación de la pregunta:", pregunta);
     
                 return {
                     respuestaId,
@@ -159,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 resultados,
             };
     
-            console.log("Resultados de la corrección con puntuaciones:", payload);
+            console.log("Resultados de la corrección con puntuaciones desde la base de datos:", payload);
             await calcularNotaYGuardar(payload);
     
             const bootstrapModal = bootstrap.Modal.getInstance(modal);
@@ -192,36 +202,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // function corregirExamenModal(usuario, examenNombre, examenId) {
-    //     return `
-    //         <div class="modal" id="corregirModal${usuario.usuarioId}" data-examen-id="${examenId}">
-    //             <div class="modal-dialog modal-lg">
-    //                 <div class="modal-content">
-    //                     <div class="modal-header">
-    //                         <h5 class="modal-title">Corregir Examen: ${examenNombre} - ${usuario.usuarioNombre}</h5>
-    //                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    //                     </div>
-    //                     <div class="modal-body">
-    //                         ${usuario.respuestas.map((respuesta) => `
-    //                             <div class="mb-3">
-    //                                 <p>Pregunta: ${respuesta.pregunta}</p>
-    //                                 <p>Respuesta: ${respuesta.respuesta}</p>
-    //                                 <div class="form-check">
-    //                                     <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.respuestaId}">
-    //                                     <label class="form-check-label" for="respuesta_${respuesta.respuestaId}">Correcta</label>
-    //                                 </div>
-    //                             </div>
-    //                         `).join('')}
-    //                     </div>
-    //                     <div class="modal-footer">
-    //                         <button type="button" class="btn btn-success" id="finalizarCorreccion${usuario.usuarioId}">Finalizar corrección</button>
-    //                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     `;
-    // }
     function corregirExamenModal(usuario, examenNombre, examenId) {
         return `
             <div class="modal" id="corregirModal${usuario.usuarioId}" data-examen-id="${examenId}">
@@ -237,12 +217,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     <p>Pregunta: ${respuesta.pregunta}</p>
                                     <p>Respuesta: ${respuesta.respuesta}</p>
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.respuestaId}">
-                                        <label class="form-check-label" for="respuesta_${respuesta.respuestaId}">Correcta</label>
-                                    </div>
-                                    <div class="mt-2">
-                                        <label for="puntuacion_${respuesta.respuestaId}" class="form-label">Puntuación:</label>
-                                        <input type="number" class="form-control" id="puntuacion_${respuesta.respuestaId}" value="${respuesta.puntuacion || 0}" min="0" step="0.1">
+                                        <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.preguntaId}">
+                                        <label class="form-check-label" for="respuesta_${respuesta.preguntaId}">Correcta</label>
                                     </div>
                                 </div>
                             `).join('')}

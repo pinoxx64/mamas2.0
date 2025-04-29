@@ -248,6 +248,7 @@ class NotaExamenController extends Controller
         return response()->json([
             'message' => 'Corrección automática realizada correctamente',
             'nota' => $nota,
+            'pregunta' => $preguntas
         ], Response::HTTP_OK);
     }
 
