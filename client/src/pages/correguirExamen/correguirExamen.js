@@ -1,3 +1,4 @@
+import { postCorrecionExamen } from "../../components/correcionExamenApi";
 import { getExamenWithInfo } from "../../components/examenApi";
 import { getExamenPreguntaByExamenId } from "../../components/examenPreguntaApi";
 import { calcularNotaYGuardar, correguirAuto, correguirAutoTodo } from "../../components/notaExamenApi";
@@ -139,66 +140,96 @@ document.addEventListener("DOMContentLoaded", async () => {
             const modal = document.getElementById(`corregirModal${usuarioId}`);
             const checkboxes = modal.querySelectorAll("input[type='checkbox']");
             const examenId = modal.getAttribute("data-examen-id");
-
-            const response = await getExamenPreguntaByExamenId(examenId);
-            const preguntas = response.examenPregunta;
-            console.log("Preguntas obtenidas:", preguntas);
-
-            const resultados = Array.from(checkboxes).map((checkbox) => {
-                console.log("Checkbox:", checkbox);
-                const respuestaId = checkbox.id.split("_")[1];
-                const correcta = checkbox.checked;
-    
-                console.log("Respuesta ID:", respuestaId);
-                console.log("Respuesta correcta:", correcta);
-                const pregunta = preguntas.find((p) => p.preguntaId == respuestaId);
-
-                const puntuacion = pregunta.puntuacion
-                console.log("Puntuación de la pregunta:", pregunta);
-    
-                return {
-                    respuestaId,
-                    correcta,
-                    puntuacion,
+        
+            try {
+                const response = await getExamenPreguntaByExamenId(examenId);
+                const preguntas = response.examenPregunta;
+        
+                const correcciones = Array.from(checkboxes).map((checkbox) => {
+                    const respuestaId = checkbox.id.split("_")[1];
+                    const correcta = checkbox.checked;
+        
+                    return {
+                        respuestaId,
+                        correcta,
+                    };
+                });
+        
+                console.log("Correcciones a enviar:", correcciones);
+        
+                // Enviar todas las correcciones en una sola solicitud
+                await postCorrecionExamen({ correcciones });
+        
+                const payload = {
+                    examenId,
+                    usuarioId,
+                    resultados: correcciones,
                 };
-            });
-    
-            const payload = {
-                examenId,
-                usuarioId,
-                resultados,
-            };
-    
-            console.log("Resultados de la corrección con puntuaciones desde la base de datos:", payload);
-            await calcularNotaYGuardar(payload);
-    
-            const bootstrapModal = bootstrap.Modal.getInstance(modal);
-            bootstrapModal.hide();
+        
+                console.log("Resultados de la corrección:", payload);
+        
+                await calcularNotaYGuardar(payload);
+        
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            } catch (error) {
+                console.error("Error al procesar la corrección:", error);
+            }
         }
     
         if (e.target.id.startsWith("confirmarAuto")) {
             const usuarioId = e.target.id.replace("confirmarAuto", "");
             const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
             const examenId = modal.getAttribute("data-examen-id");
-    
-            const payload = { examenId, usuarioId };
-            console.log("Corregir automáticamente:", payload);
-            await correguirAuto(payload);
-    
-            const bootstrapModal = bootstrap.Modal.getInstance(modal);
-            bootstrapModal.hide();
+        
+            try {
+                const payload = { examenId, usuarioId };
+                console.log("Corregir automáticamente:", payload);
+        
+                const resultados = await correguirAuto(payload);
+        
+                const correcciones = resultados.map((resultado) => ({
+                    respuestaId: resultado.respuestaId,
+                    correcta: resultado.correcta,
+                }));
+        
+                console.log("Correcciones automáticas a enviar:", correcciones);
+        
+                // Enviar todas las correcciones en una sola solicitud
+                await postCorrecionExamen({ correcciones });
+        
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            } catch (error) {
+                console.error("Error al corregir automáticamente:", error);
+            }
         }
     
         if (e.target.id === "confirmarTodo") {
             const modal = document.getElementById("confirmacionTodoModal");
             const examenId = modal.getAttribute("data-examen-id");
-    
-            const payload = { examenId };
-            console.log("Corregir todo automáticamente:", payload);
-            await correguirAutoTodo(payload);
-    
-            const bootstrapModal = bootstrap.Modal.getInstance(modal);
-            bootstrapModal.hide();
+        
+            try {
+                const payload = { examenId };
+                console.log("Corregir todo automáticamente:", payload);
+        
+                const resultados = await correguirAutoTodo(payload);
+        
+                const correcciones = resultados.map((resultado) => ({
+                    respuestaId: resultado.respuestaId,
+                    correcta: resultado.correcta,
+                }));
+        
+                console.log("Correcciones automáticas para todos a enviar:", correcciones);
+        
+                // Enviar todas las correcciones en una sola solicitud
+                await postCorrecionExamen({ correcciones });
+        
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            } catch (error) {
+                console.error("Error al corregir automáticamente todos los exámenes:", error);
+            }
         }
     });
 

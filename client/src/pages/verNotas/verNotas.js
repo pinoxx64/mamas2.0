@@ -1,66 +1,5 @@
-// import { getNotaExamenByUsuarioId } from "../../components/notaExamenApi";
-
-// document.addEventListener("DOMContentLoaded", async () => {
-//     const userId = sessionStorage.getItem("userId");
-//     const mainContent = document.querySelector(".main-content");
-
-//     const container = document.createElement("div");
-//     container.classList.add("container", "mt-5");
-
-//     const title = document.createElement("h2");
-//     title.textContent = "Tus Notas";
-//     title.classList.add("mb-4", "text-center");
-//     container.appendChild(title);
-
-//     const notasContainer = document.createElement("div");
-//     notasContainer.classList.add("notas-container");
-//     container.appendChild(notasContainer);
-
-//     mainContent.appendChild(container);
-
-//     try {
-//         const response = await getNotaExamenByUsuarioId(userId);
-//         const notas = response.notasExamen;
-
-//         if (notas.length > 0) {
-//             notas.forEach((nota) => {
-//                 console.log("Nota:", nota);
-//                 const notaCard = document.createElement("div");
-//                 notaCard.classList.add("card", "mb-3");
-
-//                 const cardBody = document.createElement("div");
-//                 cardBody.classList.add("card-body");
-
-//                 const examenTitle = document.createElement("h5");
-//                 examenTitle.classList.add("card-title");
-//                 examenTitle.textContent = `Examen: ${nota.examen.nombre}`;
-
-//                 const notaText = document.createElement("p");
-//                 notaText.classList.add("card-text");
-//                 notaText.textContent = `Nota: ${nota.nota}`;
-
-//                 cardBody.appendChild(examenTitle);
-//                 cardBody.appendChild(notaText);
-//                 notaCard.appendChild(cardBody);
-
-//                 notasContainer.appendChild(notaCard);
-//             });
-//         } else {
-//             const noNotasMessage = document.createElement("p");
-//             noNotasMessage.textContent = "No tienes notas registradas.";
-//             noNotasMessage.classList.add("text-muted", "text-center");
-//             notasContainer.appendChild(noNotasMessage);
-//         }
-//     } catch (error) {
-//         console.error("Error al obtener las notas:", error);
-//         const errorMessage = document.createElement("p");
-//         errorMessage.textContent = "Ocurrió un error al cargar tus notas.";
-//         errorMessage.classList.add("text-danger", "text-center");
-//         notasContainer.appendChild(errorMessage);
-//     }
-// });
-
 import { getNotaExamenByUsuarioId } from "../../components/notaExamenApi";
+import { getCorrecionExamenByUserAndExamen } from "../../components/correcionExamenApi";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const userId = sessionStorage.getItem("userId");
@@ -133,36 +72,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 // Agregar el modal al DOM
                 document.body.insertAdjacentHTML("beforeend", modalHtml);
-
-                // // Llenar las preguntas correctas y falladas cuando se abra el modal
-                // verPreguntasBtn.addEventListener("click", async () => {
-                //     try {
-                //         const response = await fetch(`/api/examen/${nota.examen.id}/preguntas`);
-                //         const preguntas = await response.json();
-
-                //         const correctasList = document.getElementById(`correctas-${nota.examen.id}`);
-                //         const falladasList = document.getElementById(`falladas-${nota.examen.id}`);
-
-                //         correctasList.innerHTML = "";
-                //         falladasList.innerHTML = "";
-
-                //         preguntas.correctas.forEach((pregunta) => {
-                //             const li = document.createElement("li");
-                //             li.classList.add("list-group-item");
-                //             li.textContent = pregunta.texto;
-                //             correctasList.appendChild(li);
-                //         });
-
-                //         preguntas.falladas.forEach((pregunta) => {
-                //             const li = document.createElement("li");
-                //             li.classList.add("list-group-item");
-                //             li.textContent = pregunta.texto;
-                //             falladasList.appendChild(li);
-                //         });
-                //     } catch (error) {
-                //         console.error("Error al cargar las preguntas del examen:", error);
-                //     }
-                // });
+                verPreguntasBtn.addEventListener("click", async () => {
+                    try {
+                        // Obtener las correcciones del examen para el usuario
+                        const response = await getCorrecionExamenByUserAndExamen(userId, nota.examen.id);
+                        console.log("Respuesta de la API:", response);
+                
+                        const correcciones = response?.correcciones || []; // Asegurarse de que sea un array
+                
+                        const correctasList = document.getElementById(`correctas-${nota.examen.id}`);
+                        const falladasList = document.getElementById(`falladas-${nota.examen.id}`);
+                
+                        // Limpiar las listas antes de llenarlas
+                        correctasList.innerHTML = "";
+                        falladasList.innerHTML = "";
+                
+                        if (correcciones.length === 0) {
+                            const noDataMessage = document.createElement("li");
+                            noDataMessage.classList.add("list-group-item", "text-muted");
+                            noDataMessage.textContent = "No hay datos disponibles.";
+                            correctasList.appendChild(noDataMessage);
+                            return;
+                        }
+                
+                        // Separar las preguntas correctas y falladas
+                        correcciones.forEach((correccion) => {
+                            const li = document.createElement("li");
+                            li.classList.add("list-group-item");
+                            li.textContent = correccion.respuesta?.pregunta?.texto || "Pregunta no disponible";
+                
+                            if (correccion.correcta) {
+                                correctasList.appendChild(li);
+                            } else {
+                                falladasList.appendChild(li);
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error al cargar las preguntas del examen:", error);
+                    }
+                });
 
                 cardBody.appendChild(examenTitle);
                 cardBody.appendChild(notaText);

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AsignaturaAlumnoController;
 use App\Http\Controllers\AsignaturaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\correcionExamenController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\ExamenPreguntaController;
 use App\Http\Controllers\NotaExamenController;
@@ -128,6 +129,16 @@ Route::prefix('respuestaExamen')->middleware('auth:sanctum')->group(function() {
     Route::get('/usuario/{usuarioId}/{examenId}', [RespuestaExamenController::class, 'getRespuestaExamenByUsuarioIdAndExamenId']);
     Route::post('/', [RespuestaExamenController::class, 'postRespuestaExamen']);
     Route::get('/examen/{examenId}', [RespuestaExamenController::class, 'getRespuestaExamenWithExamenAndUserByExamenId']);
+});
+
+// CorrecionExamen
+Route::prefix('correcionExamen')->middleware('auth:sanctum')->group(function() {
+    Route::get('/', [correcionExamenController::class, 'getCorrecionExamen']);
+    Route::get('/{id}', [correcionExamenController::class, 'getCorrecionExamenById']);
+    Route::get('/respuesta/{id}', [correcionExamenController::class, 'getCorrecionExamenByRespuestaId']);
+    Route::post('/', [correcionExamenController::class, 'postCorrecionExamen']);
+    Route::delete('/{id}', [correcionExamenController::class, 'deleteCorrecionExamen']);
+    Route::get('/usuario/{usuarioId}/{examenId}', [correcionExamenController::class, 'getCorrecionExamenByUserAndExamen']);
 });
 
 //Auth

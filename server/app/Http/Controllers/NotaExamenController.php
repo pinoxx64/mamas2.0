@@ -93,45 +93,6 @@ class NotaExamenController extends Controller
         return response()->json(['message' => $notaExamen], Response::HTTP_CREATED);
     }
 
-    // public function calcularNotaYGuardar(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'examenId' => 'required|integer',
-    //         'usuarioId' => 'required|integer',
-    //         'resultados' => 'required|array',
-    //         'resultados.*.respuestaId' => 'required|integer',
-    //         'resultados.*.correcta' => 'required|boolean',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
-    //     }
-
-    //     $examenId = $request->input('examenId');
-    //     $usuarioId = $request->input('usuarioId');
-    //     $resultados = $request->input('resultados');
-
-    //     $this->deleteNotaExamenExistente($examenId, $usuarioId);
-
-    //     $nota = 0;
-    //     foreach ($resultados as $resultado) {
-    //         if ($resultado['correcta']) {
-    //             $nota += 1;
-    //         }
-    //     }
-
-    //     $notaExamen = NotasExamen::create([
-    //         'examenId' => $examenId,
-    //         'usuarioId' => $usuarioId,
-    //         'nota' => $nota,
-    //     ]);
-
-    //     return response()->json([
-    //         'message' => 'Nota calculada y guardada correctamente',
-    //         'notaExamen' => $notaExamen,
-    //     ], Response::HTTP_CREATED);
-    // }
-
     public function calcularNotaYGuardar(Request $request)
     {
         $validator = Validator::make($request->all(), [
