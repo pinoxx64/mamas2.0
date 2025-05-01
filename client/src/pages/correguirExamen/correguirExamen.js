@@ -135,23 +135,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     document.addEventListener("click", async (e) => {
+        // if (e.target.id.startsWith("finalizarCorreccion")) {
+        //     const usuarioId = e.target.id.replace("finalizarCorreccion", "");
+        //     const modal = document.getElementById(`corregirModal${usuarioId}`);
+        //     const checkboxes = modal.querySelectorAll("input[type='checkbox']");
+        //     const examenId = modal.getAttribute("data-examen-id");
+        
+        //     try {
+        //         const response = await getExamenPreguntaByExamenId(examenId);
+        //         const preguntas = response.examenPregunta;
+        
+        //         const correcciones = Array.from(checkboxes).map((checkbox) => {
+        //             const respuestaId = checkbox.id.split("_")[1];
+        //             const correcta = checkbox.checked;
+        
+        //             return {
+        //                 respuestaId,
+        //                 correcta,
+        //             };
+        //         });
+        
+        //         console.log("Correcciones a enviar:", correcciones);
+        
+        //         // Enviar todas las correcciones en una sola solicitud
+        //         await postCorrecionExamen({ correcciones });
+        
+        //         const payload = {
+        //             examenId,
+        //             usuarioId,
+        //             resultados: correcciones,
+        //         };
+        
+        //         console.log("Resultados de la corrección:", payload);
+        
+        //         await calcularNotaYGuardar(payload);
+        
+        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        //         bootstrapModal.hide();
+        //     } catch (error) {
+        //         console.error("Error al procesar la corrección:", error);
+        //     }
+        // }
+
         if (e.target.id.startsWith("finalizarCorreccion")) {
-            const usuarioId = e.target.id.replace("finalizarCorreccion", "");
+            const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10); // Convertir a entero
             const modal = document.getElementById(`corregirModal${usuarioId}`);
             const checkboxes = modal.querySelectorAll("input[type='checkbox']");
-            const examenId = modal.getAttribute("data-examen-id");
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10); // Convertir a entero
         
             try {
                 const response = await getExamenPreguntaByExamenId(examenId);
                 const preguntas = response.examenPregunta;
         
                 const correcciones = Array.from(checkboxes).map((checkbox) => {
-                    const respuestaId = checkbox.id.split("_")[1];
+                    const respuestaId = parseInt(checkbox.id.split("_")[1], 10); // Convertir a entero
                     const correcta = checkbox.checked;
+        
+                    // Buscar la puntuación de la pregunta en los datos obtenidos
+                    const pregunta = preguntas.find((p) => p.preguntaId === respuestaId);
+                    const puntuacion = pregunta ? pregunta.puntuacion : 0;
         
                     return {
                         respuestaId,
                         correcta,
+                        puntuacion, // Incluir puntuación
                     };
                 });
         
@@ -177,10 +224,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     
+        // if (e.target.id.startsWith("confirmarAuto")) {
+        //     const usuarioId = e.target.id.replace("confirmarAuto", "");
+        //     const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
+        //     const examenId = modal.getAttribute("data-examen-id");
+        
+        //     try {
+        //         const payload = { examenId, usuarioId };
+        //         console.log("Corregir automáticamente:", payload);
+        
+        //         const resultados = await correguirAuto(payload);
+        
+        //         const correcciones = resultados.map((resultado) => ({
+        //             respuestaId: resultado.respuestaId,
+        //             correcta: resultado.correcta,
+        //         }));
+        
+        //         console.log("Correcciones automáticas a enviar:", correcciones);
+        
+        //         // Enviar todas las correcciones en una sola solicitud
+        //         await postCorrecionExamen({ correcciones });
+        
+        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        //         bootstrapModal.hide();
+        //     } catch (error) {
+        //         console.error("Error al corregir automáticamente:", error);
+        //     }
+        // }
+
         if (e.target.id.startsWith("confirmarAuto")) {
-            const usuarioId = e.target.id.replace("confirmarAuto", "");
+            const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10); // Convertir a entero
             const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
-            const examenId = modal.getAttribute("data-examen-id");
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10); // Convertir a entero
         
             try {
                 const payload = { examenId, usuarioId };
@@ -189,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const resultados = await correguirAuto(payload);
         
                 const correcciones = resultados.map((resultado) => ({
-                    respuestaId: resultado.respuestaId,
+                    respuestaId: parseInt(resultado.respuestaId, 10), // Convertir a entero
                     correcta: resultado.correcta,
                 }));
         
@@ -205,9 +280,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     
+        // if (e.target.id === "confirmarTodo") {
+        //     const modal = document.getElementById("confirmacionTodoModal");
+        //     const examenId = modal.getAttribute("data-examen-id");
+        
+        //     try {
+        //         const payload = { examenId };
+        //         console.log("Corregir todo automáticamente:", payload);
+        
+        //         const resultados = await correguirAutoTodo(payload);
+        
+        //         const correcciones = resultados.map((resultado) => ({
+        //             respuestaId: resultado.respuestaId,
+        //             correcta: resultado.correcta,
+        //         }));
+        
+        //         console.log("Correcciones automáticas para todos a enviar:", correcciones);
+        
+        //         // Enviar todas las correcciones en una sola solicitud
+        //         await postCorrecionExamen({ correcciones });
+        
+        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        //         bootstrapModal.hide();
+        //     } catch (error) {
+        //         console.error("Error al corregir automáticamente todos los exámenes:", error);
+        //     }
+        // }
+
         if (e.target.id === "confirmarTodo") {
             const modal = document.getElementById("confirmacionTodoModal");
-            const examenId = modal.getAttribute("data-examen-id");
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10); // Convertir a entero
         
             try {
                 const payload = { examenId };
@@ -216,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const resultados = await correguirAutoTodo(payload);
         
                 const correcciones = resultados.map((resultado) => ({
-                    respuestaId: resultado.respuestaId,
+                    respuestaId: parseInt(resultado.respuestaId, 10), // Convertir a entero
                     correcta: resultado.correcta,
                 }));
         
