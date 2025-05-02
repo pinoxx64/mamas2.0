@@ -11,12 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class correcionExamenController extends Controller
 {
-    public function getCorrecionExamen(){
+    public function getCorrecionExamen()
+    {
         $correcionExamen = ExamenPregunta::all();
         return response()->json(['correcionExamen' => $correcionExamen]);
     }
 
-    public function getCorrecionExamenById($id){
+    public function getCorrecionExamenById($id)
+    {
         $correcionExamen = ExamenPregunta::find($id);
 
         if (!$correcionExamen) {
@@ -26,7 +28,8 @@ class correcionExamenController extends Controller
         return response()->json(['correcionExamen' => $correcionExamen]);
     }
 
-    public function getCorrecionExamenByRespuestaId($id){
+    public function getCorrecionExamenByRespuestaId($id)
+    {
         $correcionExamen = ExamenPregunta::where('respuestaId', $id)->get();
 
         if (!$correcionExamen) {
@@ -36,38 +39,73 @@ class correcionExamenController extends Controller
         return response()->json(['correcionExamen' => $correcionExamen]);
     }
 
-    public function postCorrecionExamen(Request $request){
+    // public function postCorrecionExamen(Request $request){
+    //     $validator = Validator::make($request->all(), [
+    //         'correcciones' => 'required|array',
+    //         'correcciones.*.respuestaId' => 'required|integer|exists:respuesta_examen,id',
+    //         'correcciones.*.correcta' => 'required|boolean',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
+    //     }
+
+    //     try {
+    //         $correcciones = $request->input('correcciones');
+    //         $createdCorrecciones = [];
+
+    //         foreach ($correcciones as $correccion) {
+    //             $createdCorrecciones[] = CorrecionExamen::create([
+    //                 'respuestaId' => $correccion['respuestaId'],
+    //                 'correcta' => $correccion['correcta'],
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'message' => 'Correcciones creadas con éxito',
+    //             'correcciones' => $createdCorrecciones,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => 'Error al crear las correcciones: ' . $e->getMessage()], 500);
+    //     }
+    // }
+
+    public function postCorrecionExamen(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'correcciones' => 'required|array',
             'correcciones.*.respuestaId' => 'required|integer|exists:respuesta_examen,id',
             'correcciones.*.correcta' => 'required|boolean',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-    
-        try {
-            $correcciones = $request->input('correcciones');
-            $createdCorrecciones = [];
-    
-            foreach ($correcciones as $correccion) {
-                $createdCorrecciones[] = CorrecionExamen::create([
-                    'respuestaId' => $correccion['respuestaId'],
-                    'correcta' => $correccion['correcta'],
-                ]);
+
+        $correcciones = $request->input('correcciones');
+        $createdCorrecciones = [];
+
+        foreach ($correcciones as $correccion) {
+            $existingCorrecion = CorrecionExamen::where('respuestaId', $correccion['respuestaId'])->first();
+
+            if ($existingCorrecion) {
+                $existingCorrecion->delete();
             }
-    
-            return response()->json([
-                'message' => 'Correcciones creadas con éxito',
-                'correcciones' => $createdCorrecciones,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al crear las correcciones: ' . $e->getMessage()], 500);
+
+            $createdCorrecciones[] = CorrecionExamen::create([
+                'respuestaId' => $correccion['respuestaId'],
+                'correcta' => $correccion['correcta'],
+            ]);
         }
+
+        return response()->json([
+            'message' => 'Correcciones creadas con éxito',
+            'correcciones' => $createdCorrecciones,
+        ], 201);
     }
 
-    public function deleteCorrecionExamen($id){
+    public function deleteCorrecionExamen($id)
+    {
         $correcionExamen = ExamenPregunta::find($id);
 
         if (!$correcionExamen) {
@@ -82,14 +120,14 @@ class correcionExamenController extends Controller
     {
         $correcciones = CorrecionExamen::whereHas('respuesta', function ($query) use ($usuarioId, $examenId) {
             $query->where('usuarioId', $usuarioId)
-                  ->where('examenId', $examenId);
+                ->where('examenId', $examenId);
         })->with('respuesta.pregunta')
-          ->get();
-    
+            ->get();
+
         if ($correcciones->isEmpty()) {
             return response()->json(['message' => 'No se encontraron correcciones para este usuario y examen.'], 404);
         }
-    
+
         return response()->json(['correcciones' => $correcciones], 200);
     }
 }

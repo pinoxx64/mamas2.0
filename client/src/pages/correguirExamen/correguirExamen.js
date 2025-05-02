@@ -135,47 +135,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     document.addEventListener("click", async (e) => {
-        // if (e.target.id.startsWith("finalizarCorreccion")) {
-        //     const usuarioId = e.target.id.replace("finalizarCorreccion", "");
-        //     const modal = document.getElementById(`corregirModal${usuarioId}`);
-        //     const checkboxes = modal.querySelectorAll("input[type='checkbox']");
-        //     const examenId = modal.getAttribute("data-examen-id");
-        
-        //     try {
-        //         const response = await getExamenPreguntaByExamenId(examenId);
-        //         const preguntas = response.examenPregunta;
-        
-        //         const correcciones = Array.from(checkboxes).map((checkbox) => {
-        //             const respuestaId = checkbox.id.split("_")[1];
-        //             const correcta = checkbox.checked;
-        
-        //             return {
-        //                 respuestaId,
-        //                 correcta,
-        //             };
-        //         });
-        
-        //         console.log("Correcciones a enviar:", correcciones);
-        
-        //         // Enviar todas las correcciones en una sola solicitud
-        //         await postCorrecionExamen({ correcciones });
-        
-        //         const payload = {
-        //             examenId,
-        //             usuarioId,
-        //             resultados: correcciones,
-        //         };
-        
-        //         console.log("Resultados de la corrección:", payload);
-        
-        //         await calcularNotaYGuardar(payload);
-        
-        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        //         bootstrapModal.hide();
-        //     } catch (error) {
-        //         console.error("Error al procesar la corrección:", error);
-        //     }
-        // }
 
         if (e.target.id.startsWith("finalizarCorreccion")) {
             const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10); // Convertir a entero
@@ -223,34 +182,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.error("Error al procesar la corrección:", error);
             }
         }
-    
-        // if (e.target.id.startsWith("confirmarAuto")) {
-        //     const usuarioId = e.target.id.replace("confirmarAuto", "");
-        //     const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
-        //     const examenId = modal.getAttribute("data-examen-id");
-        
-        //     try {
-        //         const payload = { examenId, usuarioId };
-        //         console.log("Corregir automáticamente:", payload);
-        
-        //         const resultados = await correguirAuto(payload);
-        
-        //         const correcciones = resultados.map((resultado) => ({
-        //             respuestaId: resultado.respuestaId,
-        //             correcta: resultado.correcta,
-        //         }));
-        
-        //         console.log("Correcciones automáticas a enviar:", correcciones);
-        
-        //         // Enviar todas las correcciones en una sola solicitud
-        //         await postCorrecionExamen({ correcciones });
-        
-        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        //         bootstrapModal.hide();
-        //     } catch (error) {
-        //         console.error("Error al corregir automáticamente:", error);
-        //     }
-        // }
 
         if (e.target.id.startsWith("confirmarAuto")) {
             const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10); // Convertir a entero
@@ -261,11 +192,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const payload = { examenId, usuarioId };
                 console.log("Corregir automáticamente:", payload);
         
-                const resultados = await correguirAuto(payload);
+                const resultado = await correguirAuto(payload);
+                console.log("Resultado obtenido de correguirAuto:", resultado);
         
-                const correcciones = resultados.map((resultado) => ({
-                    respuestaId: parseInt(resultado.respuestaId, 10), // Convertir a entero
-                    correcta: resultado.correcta,
+                // Extraer la propiedad `pregunta` que contiene el array
+                const preguntas = resultado.pregunta;
+        
+                if (!Array.isArray(preguntas)) {
+                    throw new Error("La propiedad `pregunta` no es un array.");
+                }
+        
+                const correcciones = preguntas.map((pregunta) => ({
+                    respuestaId: parseInt(pregunta.respuestas[0].id, 10), // Usar el ID de la respuesta
+                    correcta: true, // Asumimos que la corrección automática marca como correcta
                 }));
         
                 console.log("Correcciones automáticas a enviar:", correcciones);
@@ -279,33 +218,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.error("Error al corregir automáticamente:", error);
             }
         }
-    
-        // if (e.target.id === "confirmarTodo") {
-        //     const modal = document.getElementById("confirmacionTodoModal");
-        //     const examenId = modal.getAttribute("data-examen-id");
-        
-        //     try {
-        //         const payload = { examenId };
-        //         console.log("Corregir todo automáticamente:", payload);
-        
-        //         const resultados = await correguirAutoTodo(payload);
-        
-        //         const correcciones = resultados.map((resultado) => ({
-        //             respuestaId: resultado.respuestaId,
-        //             correcta: resultado.correcta,
-        //         }));
-        
-        //         console.log("Correcciones automáticas para todos a enviar:", correcciones);
-        
-        //         // Enviar todas las correcciones en una sola solicitud
-        //         await postCorrecionExamen({ correcciones });
-        
-        //         const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        //         bootstrapModal.hide();
-        //     } catch (error) {
-        //         console.error("Error al corregir automáticamente todos los exámenes:", error);
-        //     }
-        // }
 
         if (e.target.id === "confirmarTodo") {
             const modal = document.getElementById("confirmacionTodoModal");
@@ -315,11 +227,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const payload = { examenId };
                 console.log("Corregir todo automáticamente:", payload);
         
-                const resultados = await correguirAutoTodo(payload);
+                const resultado = await correguirAutoTodo(payload);
+                console.log("Resultado obtenido de correguirAutoTodo:", resultado);
         
-                const correcciones = resultados.map((resultado) => ({
-                    respuestaId: parseInt(resultado.respuestaId, 10), // Convertir a entero
-                    correcta: resultado.correcta,
+                // Extraer la propiedad `notasExamen` que contiene el array
+                const notasExamen = resultado.notasExamen;
+        
+                if (!Array.isArray(notasExamen)) {
+                    throw new Error("La propiedad `notasExamen` no es un array.");
+                }
+        
+                const correcciones = notasExamen.map((nota) => ({
+                    respuestaId: nota.id, // Usar el ID de la nota como ejemplo
+                    correcta: true, // Asumimos que la corrección automática marca como correcta
                 }));
         
                 console.log("Correcciones automáticas para todos a enviar:", correcciones);
