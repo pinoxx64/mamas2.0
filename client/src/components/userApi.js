@@ -156,3 +156,58 @@ export const putPassword = async (userId, password) => {
         throw error
     }
 }
+
+// export const putUserPhoto = async (id, photo) => {
+//     const rutaUser = constantes.urlApi + constantes.user + 'photo/' + id
+//     try {
+//         const token = sessionStorage.getItem('token')
+//         const respuesta = await fetch(rutaUser, {
+//             method: 'PUT',
+//             headers: {
+//                 'Authorization': 'Bearer ' + token,
+//                 'Content-Type': 'application/json',
+//                 'Access-Control-Allow-Origin': '*'
+//             },
+//             body: JSON.stringify(photo),
+//         })
+
+//         if (!respuesta.ok) {
+//             throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`)
+//         }
+
+//         const resultado = await respuesta.json()
+//         console.log(resultado)
+//         return resultado
+//     } catch (error) {
+//         console.error('Error en la función putuser:', error.message)
+//         throw error
+//     }
+// }
+
+export const putUserPhoto = async (id, photo) => {
+    const rutaUser = constantes.urlApi + constantes.user + 'photo/' + id;
+    try {
+        const token = sessionStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('foto', photo); // Agregar la foto al FormData
+
+        const respuesta = await fetch(rutaUser, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + token, // No incluir 'Content-Type' para FormData
+            },
+            body: formData, // Enviar el FormData
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`);
+        }
+
+        const resultado = await respuesta.json();
+        console.log(resultado);
+        return resultado.foto; // Devolver la URL de la foto actualizada
+    } catch (error) {
+        console.error('Error en la función putUserPhoto:', error.message);
+        throw error;
+    }
+};

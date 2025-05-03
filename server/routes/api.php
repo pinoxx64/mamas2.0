@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('user')->middleware('auth:sanctum')->group(function() {
     Route::get('/{id}', [UserController::class, 'getUserById']);
     Route::put('/password/{id}', [UserController::class, 'putPassword']);
+    Route::put('/photo/{id}', [UserController::class, 'putUserPhoto']);
     Route::middleware('midAdmin')->group(function() {
         Route::get('/', [UserController::class, 'getUser']);
         Route::put('/{id}', [UserController::class, 'putUser']);

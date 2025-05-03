@@ -20,4 +20,8 @@ class ExamenPregunta extends Model
     {
         return $this->belongsTo(Pregunta::class, 'preguntaId');
     }
+    public function respuestas()
+    {
+    return $this->hasManyThrough(Respuesta::class,Pregunta::class,'id','preguntaId','preguntaId', 'id');
+}
 }

@@ -10,12 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExamenPreguntaController extends Controller
 {
-    public function getExamenPreguntas(){
+    public function getExamenPreguntas()
+    {
         $examenPreguntas = ExamenPregunta::all();
         return response()->json(['examenPreguntas' => $examenPreguntas]);
     }
 
-    public function getExamenPreguntaById($id){
+    public function getExamenPreguntaById($id)
+    {
         $examenPregunta = ExamenPregunta::find($id);
 
         if (!$examenPregunta) {
@@ -25,17 +27,19 @@ class ExamenPreguntaController extends Controller
         return response()->json(['examenPregunta' => $examenPregunta]);
     }
 
-    public function getExamenPreguntaByExamenId($id){
-        $examenPregunta = ExamenPregunta::where('examenId', $id)->get();
+    public function getExamenPreguntaByExamenId($id)
+    {
+        $examenPregunta = ExamenPregunta::with('respuestas')->where('examenId', $id)->get();
 
-        if (!$examenPregunta) {
+        if ($examenPregunta->isEmpty()) {
             return response()->json(['message' => 'examenPregunta don`t find'], 404);
         }
 
         return response()->json(['examenPregunta' => $examenPregunta]);
     }
 
-    public function postExamenPregunta(Request $request){
+    public function postExamenPregunta(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'examenId' => 'required|integer',
             'preguntaId' => 'required|integer',
@@ -44,7 +48,7 @@ class ExamenPreguntaController extends Controller
 
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }else{
+        } else {
             $examenPregunta = ExamenPregunta::create([
                 'examenId' => $request['examenId'],
                 'preguntaId' => $request['preguntaId'],
@@ -54,7 +58,8 @@ class ExamenPreguntaController extends Controller
         }
     }
 
-    public function deleteExamenPregunta($id){
+    public function deleteExamenPregunta($id)
+    {
         $examenPregunta = ExamenPregunta::find($id);
 
         if (!$examenPregunta) {
@@ -65,7 +70,8 @@ class ExamenPreguntaController extends Controller
         return response()->json(['message' => 'Registro eliminado correctamente'], 200);
     }
 
-    public function deleteExamenPreguntaByExamenIdAndPreguntaId($examenId, $preguntaId){
+    public function deleteExamenPreguntaByExamenIdAndPreguntaId($examenId, $preguntaId)
+    {
         $examenPregunta = ExamenPregunta::where('examenId', $examenId)->where('preguntaId', $preguntaId)->first();
 
         if (!$examenPregunta) {

@@ -70,7 +70,7 @@ class UserController extends Controller
         return response()->json(['user' => $user], Response::HTTP_CREATED);
     }
 
-    public function updateUserPhoto(Request $request, $id)
+    public function putUserPhoto(Request $request, $id)
     {
         $user = User::find($id);
 

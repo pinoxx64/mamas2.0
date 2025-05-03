@@ -13,7 +13,18 @@
         <main>
             <label for="password" class="form-label">Contraseña</label>
             <input type="text" id="password" class="form-control" placeholder="Escribe la contraseña">
-            <button class="btn btn-primary mt-3">Cambiar contraseña</button>
+            <button id="putPassword" class="btn btn-primary mt-3">Cambiar contraseña</button>
+        
+            <hr class="my-4">
+        
+            <div class="mb-3">
+                <label class="form-label">Foto de perfil</label>
+                <div id="foto-container" class="mb-3">
+                    <img id="foto-usuario" src="" alt="Foto de perfil" class="img-thumbnail" style="max-width: 150px;">
+                </div>
+                <input type="file" id="foto" class="form-control">
+                <button id="putFoto" class="btn btn-primary mt-3">Actualizar foto</button>
+            </div>
         </main>
     </div>
     <div class="overlay"></div>

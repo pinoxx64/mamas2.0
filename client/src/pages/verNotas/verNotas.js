@@ -72,6 +72,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 // Agregar el modal al DOM
                 document.body.insertAdjacentHTML("beforeend", modalHtml);
+                // verPreguntasBtn.addEventListener("click", async () => {
+
+                //     try {
+                //         // Obtener las correcciones del examen para el usuario
+                //         const response = await getCorrecionExamenByUserAndExamen(userId, nota.examen.id);
+                //         console.log("Respuesta de la API:", response);
+                
+                //         const correcciones = response?.correcciones || []; // Asegurarse de que sea un array
+                
+                //         const correctasList = document.getElementById(`correctas-${nota.examen.id}`);
+                //         const falladasList = document.getElementById(`falladas-${nota.examen.id}`);
+                
+                //         // Limpiar las listas antes de llenarlas
+                //         correctasList.innerHTML = "";
+                //         falladasList.innerHTML = "";
+                
+                //         if (correcciones.length === 0) {
+                //             const noDataMessage = document.createElement("li");
+                //             noDataMessage.classList.add("list-group-item", "text-muted");
+                //             noDataMessage.textContent = "No hay datos disponibles.";
+                //             correctasList.appendChild(noDataMessage);
+                //             return;
+                //         }
+                
+                //         // Separar las preguntas correctas y falladas
+                //         correcciones.forEach((correccion) => {
+                //             const li = document.createElement("li");
+                //             li.classList.add("list-group-item");
+                //             li.textContent = correccion.respuesta?.pregunta?.texto || "Pregunta no disponible";
+                
+                //             if (correccion.correcta) {
+                //                 correctasList.appendChild(li);
+                //             } else {
+                //                 falladasList.appendChild(li);
+                //             }
+                //         });
+                //     } catch (error) {
+                //         console.error("Error al cargar las preguntas del examen:", error);
+                //     }
+                // });
+
                 verPreguntasBtn.addEventListener("click", async () => {
                     try {
                         // Obtener las correcciones del examen para el usuario
@@ -99,7 +140,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         correcciones.forEach((correccion) => {
                             const li = document.createElement("li");
                             li.classList.add("list-group-item");
-                            li.textContent = correccion.respuesta?.pregunta?.texto || "Pregunta no disponible";
+                            console.log("Corrección:", correccion);
+                            // Mostrar la pregunta, la respuesta del usuario y si fue correcta
+                        
+                            const preguntaTexto = correccion.respuesta?.pregunta?.pregunta || "Pregunta no disponible";
+                            const respuestaTexto = correccion.respuesta?.respuesta || "Respuesta no disponible";
+                            const esCorrecta = correccion.correcta ? "Correcta" : "Incorrecta";
+                
+                            li.textContent = `Pregunta: "${preguntaTexto}" - Respuesta: "${respuestaTexto}" - ${esCorrecta}`;
                 
                             if (correccion.correcta) {
                                 correctasList.appendChild(li);
