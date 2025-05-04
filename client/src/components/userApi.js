@@ -1,4 +1,4 @@
-import { constantes } from "./constantes";
+import { constantes } from "./constantes"
 
 export const register = async (user) => {
     const rutaUser = constantes.urlApi + constantes.registro
@@ -157,57 +157,30 @@ export const putPassword = async (userId, password) => {
     }
 }
 
-// export const putUserPhoto = async (id, photo) => {
-//     const rutaUser = constantes.urlApi + constantes.user + 'photo/' + id
-//     try {
-//         const token = sessionStorage.getItem('token')
-//         const respuesta = await fetch(rutaUser, {
-//             method: 'PUT',
-//             headers: {
-//                 'Authorization': 'Bearer ' + token,
-//                 'Content-Type': 'application/json',
-//                 'Access-Control-Allow-Origin': '*'
-//             },
-//             body: JSON.stringify(photo),
-//         })
-
-//         if (!respuesta.ok) {
-//             throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`)
-//         }
-
-//         const resultado = await respuesta.json()
-//         console.log(resultado)
-//         return resultado
-//     } catch (error) {
-//         console.error('Error en la función putuser:', error.message)
-//         throw error
-//     }
-// }
-
 export const putUserPhoto = async (id, photo) => {
-    const rutaUser = constantes.urlApi + constantes.user + 'photo/' + id;
+    const rutaUser = constantes.urlApi + constantes.user + 'photo/' + id
     try {
-        const token = sessionStorage.getItem('token');
-        const formData = new FormData();
-        formData.append('foto', photo); // Agregar la foto al FormData
+        const token = sessionStorage.getItem('token')
+        const formData = new FormData()
+        formData.append('foto', photo)
 
         const respuesta = await fetch(rutaUser, {
             method: 'PUT',
             headers: {
-                'Authorization': 'Bearer ' + token, // No incluir 'Content-Type' para FormData
+                'Authorization': 'Bearer ' + token,
             },
-            body: formData, // Enviar el FormData
-        });
+            body: formData,
+        })
 
         if (!respuesta.ok) {
-            throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`);
+            throw new Error(`Error al editar el user. Código de estado: ${respuesta.status}`)
         }
 
-        const resultado = await respuesta.json();
-        console.log(resultado);
-        return resultado.foto; // Devolver la URL de la foto actualizada
+        const resultado = await respuesta.json()
+        console.log(resultado)
+        return resultado.foto
     } catch (error) {
-        console.error('Error en la función putUserPhoto:', error.message);
-        throw error;
+        console.error('Error en la función putUserPhoto:', error.message)
+        throw error
     }
-};
+}

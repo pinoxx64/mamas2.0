@@ -299,10 +299,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                         }
                     }
     
-                    // Obtener el nombre de la asignatura
                     const asignaturaNombre = asignaturas.asignatura.find(asignatura => asignatura.id == asignaturaId)?.nombre || 'Sin asignatura';
     
-                    // Actualizar la fila en la tabla
                     const tabla = $('#Preguntas').DataTable();
                     const row = tabla.row(`[data-id="${pre.id}"]`);
     
@@ -318,12 +316,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                         tipo,
                         pregunta,
                         opcionesTexto,
-                        asignaturaNombre, // Mostrar el nombre de la asignatura
+                        asignaturaNombre,
                         respuestas,
                         row.data()[5],
                     ]).draw(false);
     
-                    // Cerrar el modal correctamente
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.hide();

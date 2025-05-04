@@ -37,14 +37,14 @@ export const deleteUserRol = async (userId, rolId) => {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             }
-        });
+        })
 
         if (!respuesta.ok) {
-            throw new Error(`Error al eliminar el rol del usuario. Código de estado: ${respuesta.status}`);
+            throw new Error(`Error al eliminar el rol del usuario. Código de estado: ${respuesta.status}`)
         }
 
-        const resultado = await respuesta.json();
-        return resultado;
+        const resultado = await respuesta.json()
+        return resultado
     } catch (error) {
         console.error('Error en la función deleteUsuarioRol:', error.message)
         throw error
@@ -65,13 +65,13 @@ export const postUserRol = async (userRol) => {
             body: JSON.stringify(userRol),
         })
         if (!respuesta.ok) {
-            throw new Error(`Error al añadir el usuario rol. Código de estado: ${respuesta.status}`);
+            throw new Error(`Error al añadir el usuario rol. Código de estado: ${respuesta.status}`)
         }
 
-        const resultado = await respuesta.json();
-        return resultado;
+        const resultado = await respuesta.json()
+        return resultado
     } catch (error) {
-        console.error('Error en la función postUsuarioRol:', error.message);
-        throw error;
+        console.error('Error en la función postUsuarioRol:', error.message)
+        throw error
     }
 }

@@ -7,11 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const examen = await getExamenById(examenId);
     const mainContent = document.querySelector('.main-content');
 
-    if (!examen || !examen.examen) {
-        mainContent.innerHTML = "<p class='text-danger'>No se pudo cargar el examen. Por favor, inténtelo más tarde.</p>";
-        return;
-    }
-
     const exam = document.createElement('form');
     exam.id = 'examenForm';
 
