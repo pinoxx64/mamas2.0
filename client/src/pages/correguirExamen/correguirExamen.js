@@ -1,251 +1,251 @@
-import { postCorrecionExamen } from "../../components/correcionExamenApi";
-import { getExamenWithInfo } from "../../components/examenApi";
-import { getExamenPreguntaByExamenId } from "../../components/examenPreguntaApi";
-import { calcularNotaYGuardar, correguirAuto, correguirAutoTodo } from "../../components/notaExamenApi";
+import { postCorrecionExamen } from "../../components/correcionExamenApi"
+import { getExamenWithInfo } from "../../components/examenApi"
+import { getExamenPreguntaByExamenId } from "../../components/examenPreguntaApi"
+import { calcularNotaYGuardar } from "../../components/notaExamenApi"
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const userId = sessionStorage.getItem("userId");
-    const mainContent = document.querySelector(".main-content");
+    const userId = sessionStorage.getItem("userId")
+    const mainContent = document.querySelector(".main-content")
 
-    const container = document.createElement("div");
-    container.classList.add("container", "mt-5");
+    const container = document.createElement("div")
+    container.classList.add("container", "mt-5")
 
-    const title = document.createElement("h2");
-    title.textContent = "Corregir Exámenes";
-    title.classList.add("mb-4", "text-center");
-    container.appendChild(title);
+    const title = document.createElement("h2")
+    title.textContent = "Corregir Exámenes"
+    title.classList.add("mb-4", "text-center")
+    container.appendChild(title)
 
-    const examDropdown = document.createElement("select");
-    examDropdown.classList.add("form-select", "mb-4");
-    examDropdown.innerHTML = `<option value="">Selecciona un examen</option>`;
-    container.appendChild(examDropdown);
+    const examDropdown = document.createElement("select")
+    examDropdown.classList.add("form-select", "mb-4")
+    examDropdown.innerHTML = `<option value="">Selecciona un examen</option>`
+    container.appendChild(examDropdown)
 
-    const userContainer = document.createElement("div");
-    userContainer.classList.add("mt-4");
-    container.appendChild(userContainer);
+    const userContainer = document.createElement("div")
+    userContainer.classList.add("mt-4")
+    container.appendChild(userContainer)
 
-    mainContent.appendChild(container);
+    mainContent.appendChild(container)
 
     try {
-        const response = await getExamenWithInfo(userId);
-        const examenes = response.examenes;
+        const response = await getExamenWithInfo(userId)
+        const examenes = response.examenes
 
         if (examenes.length > 0) {
             examenes.forEach((examen) => {
-                const option = document.createElement("option");
-                option.value = examen.examenId;
-                option.textContent = examen.nombre;
-                examDropdown.appendChild(option);
-            });
+                const option = document.createElement("option")
+                option.value = examen.examenId
+                option.textContent = examen.nombre
+                examDropdown.appendChild(option)
+            })
         } else {
-            const noExamsMessage = document.createElement("p");
-            noExamsMessage.textContent = "No has creado ningún examen.";
-            noExamsMessage.classList.add("text-muted", "text-center");
-            container.appendChild(noExamsMessage);
+            const noExamsMessage = document.createElement("p")
+            noExamsMessage.textContent = "No has creado ningún examen."
+            noExamsMessage.classList.add("text-muted", "text-center")
+            container.appendChild(noExamsMessage)
         }
     } catch (error) {
-        console.error("Error al obtener los exámenes:", error);
-        const errorMessage = document.createElement("p");
-        errorMessage.textContent = "Ocurrió un error al cargar los exámenes.";
-        errorMessage.classList.add("text-danger", "text-center");
-        container.appendChild(errorMessage);
+        console.error("Error al obtener los exámenes:", error)
+        const errorMessage = document.createElement("p")
+        errorMessage.textContent = "Ocurrió un error al cargar los exámenes."
+        errorMessage.classList.add("text-danger", "text-center")
+        container.appendChild(errorMessage)
     }
 
     examDropdown.addEventListener("change", async (e) => {
-        const examenId = e.target.value;
+        const examenId = e.target.value
 
-        userContainer.innerHTML = "";
+        userContainer.innerHTML = ""
 
-        if (!examenId) return;
+        if (!examenId) return
 
         try {
-            const response = await getExamenWithInfo(userId);
+            const response = await getExamenWithInfo(userId)
             const examenSeleccionado = response.examenes.find(
                 (examen) => examen.examenId == examenId
-            );
+            )
 
             if (examenSeleccionado && examenSeleccionado.usuarios.length > 0) {
                 examenSeleccionado.usuarios.forEach((usuario) => {
-                    const userRow = document.createElement("div");
+                    const userRow = document.createElement("div")
                     userRow.classList.add(
                         "d-flex",
                         "align-items-center",
                         "justify-content-between",
                         "mb-3"
-                    );
+                    )
 
-                    const userName = document.createElement("span");
-                    userName.textContent = `Usuario: ${usuario.usuarioNombre}`;
-                    userName.classList.add("fw-bold");
+                    const userName = document.createElement("span")
+                    userName.textContent = `Usuario: ${usuario.usuarioNombre}`
+                    userName.classList.add("fw-bold")
 
-                    const corregirButton = document.createElement("button");
-                    corregirButton.textContent = "Corregir";
-                    corregirButton.classList.add("btn", "btn-primary", "btn-sm");
-                    corregirButton.setAttribute("data-bs-toggle", "modal");
-                    corregirButton.setAttribute("data-bs-target", `#corregirModal${usuario.usuarioId}`);
+                    const corregirButton = document.createElement("button")
+                    corregirButton.textContent = "Corregir"
+                    corregirButton.classList.add("btn", "btn-primary", "btn-sm")
+                    corregirButton.setAttribute("data-bs-toggle", "modal")
+                    corregirButton.setAttribute("data-bs-target", `#corregirModal${usuario.usuarioId}`)
 
-                    const autoButton = document.createElement("button");
-                    autoButton.textContent = "Auto";
-                    autoButton.classList.add("btn", "btn-secondary", "btn-sm", "ms-2");
-                    autoButton.setAttribute("data-bs-toggle", "modal");
-                    autoButton.setAttribute("data-bs-target", `#confirmacionAutoModal${usuario.usuarioId}`);
+                    const autoButton = document.createElement("button")
+                    autoButton.textContent = "Auto"
+                    autoButton.classList.add("btn", "btn-secondary", "btn-sm", "ms-2")
+                    autoButton.setAttribute("data-bs-toggle", "modal")
+                    autoButton.setAttribute("data-bs-target", `#confirmacionAutoModal${usuario.usuarioId}`)
 
-                    userRow.appendChild(userName);
-                    userRow.appendChild(corregirButton);
-                    userRow.appendChild(autoButton);
+                    userRow.appendChild(userName)
+                    userRow.appendChild(corregirButton)
+                    userRow.appendChild(autoButton)
 
-                    userContainer.appendChild(userRow);
+                    userContainer.appendChild(userRow)
 
                     document.body.insertAdjacentHTML(
                         "beforeend",
                         corregirExamenModal(usuario, examenSeleccionado.nombre, examenSeleccionado.examenId)
-                    );
+                    )
                     document.body.insertAdjacentHTML(
                         "beforeend",
                         confirmacionAutoModal(usuario, examenSeleccionado.examenId)
-                    );
-                });
+                    )
+                })
 
-                const corregirTodoButton = document.createElement("button");
-                corregirTodoButton.textContent = "Corregir todo auto";
-                corregirTodoButton.classList.add("btn", "btn-success", "mt-4");
-                corregirTodoButton.setAttribute("data-bs-toggle", "modal");
-                corregirTodoButton.setAttribute("data-bs-target", "#confirmacionTodoModal");
+                const corregirTodoButton = document.createElement("button")
+                corregirTodoButton.textContent = "Corregir todo auto"
+                corregirTodoButton.classList.add("btn", "btn-success", "mt-4")
+                corregirTodoButton.setAttribute("data-bs-toggle", "modal")
+                corregirTodoButton.setAttribute("data-bs-target", "#confirmacionTodoModal")
 
-                userContainer.appendChild(corregirTodoButton);
+                userContainer.appendChild(corregirTodoButton)
 
                 document.body.insertAdjacentHTML(
                     "beforeend",
                     confirmacionTodoModal(examenSeleccionado.examenId)
-                );
+                )
             } else {
-                const noUsersMessage = document.createElement("p");
-                noUsersMessage.textContent = "No hay respuestas asociadas a este examen.";
-                noUsersMessage.classList.add("text-muted", "text-center");
-                userContainer.appendChild(noUsersMessage);
+                const noUsersMessage = document.createElement("p")
+                noUsersMessage.textContent = "No hay respuestas asociadas a este examen."
+                noUsersMessage.classList.add("text-muted", "text-center")
+                userContainer.appendChild(noUsersMessage)
             }
         } catch (error) {
-            console.error("Error al obtener las respuestas del examen:", error);
-            const errorMessage = document.createElement("p");
-            errorMessage.textContent = "Ocurrió un error al cargar las respuestas.";
-            errorMessage.classList.add("text-danger", "text-center");
-            userContainer.appendChild(errorMessage);
+            console.error("Error al obtener las respuestas del examen:", error)
+            const errorMessage = document.createElement("p")
+            errorMessage.textContent = "Ocurrió un error al cargar las respuestas."
+            errorMessage.classList.add("text-danger", "text-center")
+            userContainer.appendChild(errorMessage)
         }
-    });
+    })
 
     document.addEventListener("click", async (e) => {
         if (e.target.id.startsWith("finalizarCorreccion")) {
-            const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10);
-            const modal = document.getElementById(`corregirModal${usuarioId}`);
-            const checkboxes = modal.querySelectorAll("input[type='checkbox']");
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
+            const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10)
+            const modal = document.getElementById(`corregirModal${usuarioId}`)
+            const checkboxes = modal.querySelectorAll("input[type='checkbox']")
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId);
-                const preguntas = response.examenPregunta;
+                const response = await getExamenPreguntaByExamenId(examenId)
+                const preguntas = response.examenPregunta
 
-                console.log("Preguntas obtenidas:", preguntas);
+                console.log("Preguntas obtenidas:", preguntas)
 
                 const correcciones = Array.from(checkboxes).map((checkbox) => {
-                    const respuestaId = parseInt(checkbox.id.split("_")[1], 10);
-                    const correcta = checkbox.checked;
+                    const respuestaId = parseInt(checkbox.id.split("_")[1], 10)
+                    const correcta = checkbox.checked
 
                     const pregunta = preguntas.find((p) =>
                         Array.isArray(p.respuestas) && p.respuestas.some((r) => r.id === respuestaId)
-                    );
+                    )
 
                     if (!pregunta) {
-                        console.error(`No se encontró una pregunta para respuestaId: ${respuestaId}`);
-                        return null;
+                        console.error(`No se encontró una pregunta para respuestaId: ${respuestaId}`)
+                        return null
                     }
 
-                    const respuesta = pregunta.respuestas.find((r) => r.id === respuestaId);
+                    const respuesta = pregunta.respuestas.find((r) => r.id === respuestaId)
 
                     return {
                         respuestaId: respuesta?.id,
                         correcta,
                         puntuacion: pregunta ? pregunta.puntuacion : 0,
-                    };
-                }).filter((correccion) => correccion !== null);
+                    }
+                }).filter((correccion) => correccion !== null)
 
-                console.log("Correcciones a enviar:", correcciones);
+                console.log("Correcciones a enviar:", correcciones)
 
-                await postCorrecionExamen({ correcciones });
+                await postCorrecionExamen({ correcciones })
 
                 const payload = {
                     examenId,
                     usuarioId,
                     resultados: correcciones,
-                };
-
-                console.log("Resultados de la corrección:", payload);
-
-                await calcularNotaYGuardar(payload);
-
-                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`);
-                if (userNameElement) {
-                    userNameElement.style.color = "green";
                 }
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                bootstrapModal.hide();
+                console.log("Resultados de la corrección:", payload)
+
+                await calcularNotaYGuardar(payload)
+
+                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`)
+                if (userNameElement) {
+                    userNameElement.style.color = "green"
+                }
+
+                const bootstrapModal = bootstrap.Modal.getInstance(modal)
+                bootstrapModal.hide()
             } catch (error) {
-                console.error("Error al procesar la corrección:", error);
+                console.error("Error al procesar la corrección:", error)
             }
         }
 
         if (e.target.id.startsWith("confirmarAuto")) {
-            const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10);
-            const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
+            const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10)
+            const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`)
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId);
-                const preguntas = response.examenPregunta;
+                const response = await getExamenPreguntaByExamenId(examenId)
+                const preguntas = response.examenPregunta
 
-                console.log("Preguntas obtenidas:", preguntas);
+                console.log("Preguntas obtenidas:", preguntas)
 
                 const correcciones = preguntas.map((pregunta) => ({
                     respuestaId: pregunta.respuestas[0]?.id,
                     correcta: true,
                     puntuacion: pregunta.puntuacion,
-                }));
+                }))
 
-                console.log("Correcciones automáticas a enviar:", correcciones);
+                console.log("Correcciones automáticas a enviar:", correcciones)
 
-                await postCorrecionExamen({ correcciones });
+                await postCorrecionExamen({ correcciones })
 
                 const payload = {
                     examenId,
                     usuarioId,
                     resultados: correcciones,
-                };
-
-                console.log("Resultados de la corrección automática:", payload);
-
-                await calcularNotaYGuardar(payload);
-
-                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`);
-                if (userNameElement) {
-                    userNameElement.style.color = "green";
                 }
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                bootstrapModal.hide();
+                console.log("Resultados de la corrección automática:", payload)
+
+                await calcularNotaYGuardar(payload)
+
+                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`)
+                if (userNameElement) {
+                    userNameElement.style.color = "green"
+                }
+
+                const bootstrapModal = bootstrap.Modal.getInstance(modal)
+                bootstrapModal.hide()
             } catch (error) {
-                console.error("Error al corregir automáticamente:", error);
+                console.error("Error al corregir automáticamente:", error)
             }
         }
 
         if (e.target.id === "confirmarTodo") {
-            const modal = document.getElementById("confirmacionTodoModal");
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
+            const modal = document.getElementById("confirmacionTodoModal")
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId);
-                const preguntas = response.examenPregunta;
+                const response = await getExamenPreguntaByExamenId(examenId)
+                const preguntas = response.examenPregunta
 
-                console.log("Preguntas obtenidas:", preguntas);
+                console.log("Preguntas obtenidas:", preguntas)
 
                 const correcciones = preguntas.flatMap((pregunta) =>
                     pregunta.respuestas.map((respuesta) => ({
@@ -253,26 +253,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                         correcta: true,
                         puntuacion: pregunta.puntuacion,
                     }))
-                );
+                )
 
-                console.log("Correcciones automáticas para todos a enviar:", correcciones);
+                console.log("Correcciones automáticas para todos a enviar:", correcciones)
 
-                await postCorrecionExamen({ correcciones });
+                await postCorrecionExamen({ correcciones })
 
-                console.log("Resultados de la corrección automática para todos los usuarios.");
+                console.log("Resultados de la corrección automática para todos los usuarios.")
 
-                const userNameElements = document.querySelectorAll("span[data-usuario-id]");
+                const userNameElements = document.querySelectorAll("span[data-usuario-id]")
                 userNameElements.forEach((element) => {
-                    element.style.color = "green";
-                });
+                    element.style.color = "green"
+                })
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                bootstrapModal.hide();
+                const bootstrapModal = bootstrap.Modal.getInstance(modal)
+                bootstrapModal.hide()
             } catch (error) {
-                console.error("Error al corregir automáticamente todos los exámenes:", error);
+                console.error("Error al corregir automáticamente todos los exámenes:", error)
             }
         }
-    });
+    })
 
     function corregirExamenModal(usuario, examenNombre, examenId) {
         return `
@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </div>
             </div>
-        `;
+        `
     }
 
     function confirmacionAutoModal(usuario, examenId) {
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </div>
             </div>
-        `;
+        `
     }
 
     function confirmacionTodoModal(examenId) {
@@ -340,6 +340,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </div>
             </div>
-        `;
+        `
     }
-});
+})

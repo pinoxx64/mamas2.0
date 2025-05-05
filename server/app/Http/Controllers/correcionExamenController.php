@@ -39,37 +39,6 @@ class correcionExamenController extends Controller
         return response()->json(['correcionExamen' => $correcionExamen]);
     }
 
-    // public function postCorrecionExamen(Request $request){
-    //     $validator = Validator::make($request->all(), [
-    //         'correcciones' => 'required|array',
-    //         'correcciones.*.respuestaId' => 'required|integer|exists:respuesta_examen,id',
-    //         'correcciones.*.correcta' => 'required|boolean',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()->all()], Response::HTTP_UNPROCESSABLE_ENTITY);
-    //     }
-
-    //     try {
-    //         $correcciones = $request->input('correcciones');
-    //         $createdCorrecciones = [];
-
-    //         foreach ($correcciones as $correccion) {
-    //             $createdCorrecciones[] = CorrecionExamen::create([
-    //                 'respuestaId' => $correccion['respuestaId'],
-    //                 'correcta' => $correccion['correcta'],
-    //             ]);
-    //         }
-
-    //         return response()->json([
-    //             'message' => 'Correcciones creadas con éxito',
-    //             'correcciones' => $createdCorrecciones,
-    //         ], 201);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Error al crear las correcciones: ' . $e->getMessage()], 500);
-    //     }
-    // }
-
     public function postCorrecionExamen(Request $request)
     {
         $validator = Validator::make($request->all(), [

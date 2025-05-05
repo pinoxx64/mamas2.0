@@ -96,33 +96,4 @@ class RespuestaExamenController extends Controller
             'respuestasGuardadas' => $respuestasGuardadas
         ], Response::HTTP_CREATED);
     }
-
-    // public function getRespuestaExamenWithExamenAndUserByExamenId($id)
-    // {
-    //     $respuestas = RespuestaExamen::where('examenId', $examenId)->with(['usuario', 'pregunta'])->get();
-
-    //     if ($respuestas->isEmpty()) {
-    //         return response()->json(['message' => 'No se encontraron respuestas para este examen'], 404);
-    //     }
-
-    //     $usuarios = $respuestas->groupBy('usuarioId')->map(function ($respuestasUsuario) {
-    //         return [
-    //             'usuarioId' => $respuestasUsuario->first()->usuario->id,
-    //             'usuarioNombre' => $respuestasUsuario->first()->usuario->name ?? 'Desconocido',
-    //             'respuestas' => $respuestasUsuario->map(function ($respuesta) {
-    //                 return [
-    //                     'respuestaId' => $respuesta->id,
-    //                     'preguntaId' => $respuesta->preguntaId,
-    //                     'pregunta' => $respuesta->pregunta->pregunta ?? 'Pregunta no encontrada',
-    //                     'respuesta' => $respuesta->respuesta
-    //                 ];
-    //             })
-    //         ];
-    //     })->values();
-
-    //     return response()->json([
-    //         'examenId' => $examenId,
-    //         'usuarios' => $usuarios
-    //     ], Response::HTTP_OK);
-    // }
 }
