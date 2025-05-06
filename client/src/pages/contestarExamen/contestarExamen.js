@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 respuestaContainer.textContent = 'Arrastra aquí tu respuesta';
             });
 
-            const opciones = pregunta.opciones ? pregunta.opciones.split('\\n') : [];
+            const opciones = pregunta.opciones ? pregunta.opciones.split('\n') : [];
             opciones.forEach(opcion => {
                 const opcionElement = document.createElement('div');
                 opcionElement.classList.add('p-2', 'border', 'rounded', 'bg-white', 'draggable');

@@ -29,13 +29,19 @@ class PreguntaSeeder extends Seeder
             [
                 'tipo' => 'opciones individuales',
                 'pregunta' => 'Escoja una de las siguientes',
-                'opciones' => 'a \n b \n c \n d',
+                'opciones' => 'a
+b
+c
+d',
                 'asignaturaId' => 1
             ],
             [
                 'tipo' => 'opciones multiples',
                 'pregunta' => 'Escoja dos de las siguientes',
-                'opciones' => 'a \n b \n c \n d',
+                'opciones' => 'a
+b
+c
+d',
                 'asignaturaId' => 2
             ]            
         ];

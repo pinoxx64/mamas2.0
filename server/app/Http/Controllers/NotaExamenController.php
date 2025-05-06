@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExamenPregunta;
 use App\Models\NotasExamen;
 use App\Models\Pregunta;
 use App\Models\RespuestaExamen;
@@ -101,7 +102,6 @@ class NotaExamenController extends Controller
             'resultados' => 'required|array',
             'resultados.*.respuestaId' => 'required|integer',
             'resultados.*.correcta' => 'required|boolean',
-            'resultados.*.puntuacion' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -112,26 +112,34 @@ class NotaExamenController extends Controller
         $usuarioId = $request->input('usuarioId');
         $resultados = $request->input('resultados');
 
-        $this->deleteNotaExamenExistente($examenId, $usuarioId);
+        $preguntas = ExamenPregunta::where('examenId', $examenId)
+            ->with('pregunta')
+            ->get();
+
+        if ($preguntas->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron preguntas para este examen'], 404);
+        }
 
         $notaTotal = 0;
-        $puntuacionMaxima = 0;
+        $puntuacionMaxima = $preguntas->sum('puntuacion');
 
         foreach ($resultados as $resultado) {
-            $puntuacion = $resultado['puntuacion'];
-            $puntuacionMaxima += $puntuacion;
+            $respuestaExamen = RespuestaExamen::find($resultado['respuestaId']);
 
-            if ($resultado['correcta']) {
-                $notaTotal += $puntuacion;
+            if ($respuestaExamen && $resultado['correcta']) {
+                $pregunta = $preguntas->firstWhere('preguntaId', $respuestaExamen->preguntaId);
+                if ($pregunta) {
+                    $notaTotal += $pregunta->puntuacion;
+                }
             }
         }
+
         $notaFinal = $puntuacionMaxima > 0 ? ($notaTotal / $puntuacionMaxima) * 10 : 0;
 
-        $notaExamen = NotasExamen::create([
-            'examenId' => $examenId,
-            'usuarioId' => $usuarioId,
-            'nota' => $notaFinal,
-        ]);
+        $notaExamen = NotasExamen::updateOrCreate(
+            ['examenId' => $examenId, 'usuarioId' => $usuarioId],
+            ['nota' => $notaFinal]
+        );
 
         return response()->json([
             'message' => 'Nota calculada y guardada correctamente',
@@ -163,45 +171,41 @@ class NotaExamenController extends Controller
             return response()->json(['message' => 'No se encontraron respuestas para este usuario en este examen'], 404);
         }
 
-        $preguntas = Pregunta::whereHas('examen', function ($query) use ($examenId) {
-            $query->where('examenId', $examenId);
-        })->with(['respuestas', 'examenPregunta' => function ($query) use ($examenId) {
-            $query->where('examenId', $examenId);
-        }])->get();
-
-        if ($preguntas->isEmpty()) {
-            return response()->json(['message' => 'No se encontraron preguntas para este examen'], 404);
-        }
+        $preguntas = ExamenPregunta::where('examenId', $examenId)
+            ->with('pregunta')
+            ->get();
 
         $nota = 0;
+        $correcciones = [];
 
         foreach ($respuestasUsuario as $respuestaUsuario) {
-            $pregunta = $preguntas->firstWhere('id', $respuestaUsuario->preguntaId);
+            $pregunta = $preguntas->firstWhere('preguntaId', $respuestaUsuario->preguntaId);
+            $correcta = false;
 
             if ($pregunta) {
-                $respuestaCorrecta = $pregunta->respuestas->first();
-                $puntuacion = $pregunta->examenPregunta->puntuacion;
+                $respuestaCorrecta = $pregunta->pregunta->respuesta_correcta;
 
-                if ($pregunta->tipo === 'numero' || $pregunta->tipo === 'texto') {
-                    if ($respuestaCorrecta && trim(strtolower($respuestaCorrecta->respuesta)) === trim(strtolower($respuestaUsuario->respuesta))) {
-                        $nota += $puntuacion;
-                    }
-                } elseif ($pregunta->tipo === 'opciones individuales') {
-                    if ($respuestaCorrecta && trim(strtolower($respuestaCorrecta->respuesta)) === trim(strtolower($respuestaUsuario->respuesta))) {
-                        $nota += $puntuacion;
-                    }
-                } elseif ($pregunta->tipo === 'opciones multiples') {
-                    $respuestasCorrectas = explode(',', str_replace(' ', '', strtolower($respuestaCorrecta->respuesta)));
-                    $respuestasUsuario = explode(',', str_replace(' ', '', strtolower($respuestaUsuario->respuesta)));
+                $respuestasCorrectas = array_map('trim', explode(',', strtolower($respuestaCorrecta)));
+                $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
-                    if (!array_diff($respuestasCorrectas, $respuestasUsuario)) {
-                        $nota += $puntuacion;
-                    }
+                if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
+                    $nota += $pregunta->puntuacion;
+                    $correcta = true;
                 }
+
+                $correcciones[] = [
+                    'respuestaId' => $respuestaUsuario->id,
+                    'correcta' => $correcta,
+                ];
             }
         }
 
-        NotasExamen::updateOrCreate(
+        $correcionController = new correcionExamenController();
+        $correcionController->postCorrecionExamen(new Request([
+            'correcciones' => $correcciones,
+        ]));
+
+        $notaExamen = NotasExamen::updateOrCreate(
             ['examenId' => $examenId, 'usuarioId' => $usuarioId],
             ['nota' => $nota]
         );
@@ -209,7 +213,7 @@ class NotaExamenController extends Controller
         return response()->json([
             'message' => 'Corrección automática realizada correctamente',
             'nota' => $nota,
-            'pregunta' => $preguntas
+            'correcciones' => $correcciones,
         ], Response::HTTP_OK);
     }
 
@@ -234,17 +238,12 @@ class NotaExamenController extends Controller
             return response()->json(['message' => 'No se encontraron usuarios que hayan contestado este examen'], 404);
         }
 
-        $preguntas = Pregunta::whereHas('examen', function ($query) use ($examenId) {
-            $query->where('examenId', $examenId);
-        })->with(['respuestas', 'examenPregunta' => function ($query) use ($examenId) {
-            $query->where('examenId', $examenId);
-        }])->get();
-
-        if ($preguntas->isEmpty()) {
-            return response()->json(['message' => 'No se encontraron preguntas para este examen'], 404);
-        }
+        $preguntas = ExamenPregunta::where('examenId', $examenId)
+            ->with('pregunta')
+            ->get();
 
         $notasGuardadas = [];
+        $correcionController = new correcionExamenController();
 
         foreach ($usuarios as $usuario) {
             $usuarioId = $usuario->usuarioId;
@@ -256,32 +255,33 @@ class NotaExamenController extends Controller
                 ->get();
 
             $nota = 0;
+            $correcciones = [];
 
             foreach ($respuestasUsuario as $respuestaUsuario) {
-                $pregunta = $preguntas->firstWhere('id', $respuestaUsuario->preguntaId);
+                $pregunta = $preguntas->firstWhere('preguntaId', $respuestaUsuario->preguntaId);
+                $correcta = false;
 
                 if ($pregunta) {
-                    $respuestaCorrecta = $pregunta->respuestas->first();
-                    $puntuacion = $pregunta->examenPregunta->puntuacion;
+                    $respuestaCorrecta = $pregunta->pregunta->respuesta_correcta;
 
-                    if ($pregunta->tipo === 'numero' || $pregunta->tipo === 'texto') {
-                        if ($respuestaCorrecta && trim(strtolower($respuestaCorrecta->respuesta)) === trim(strtolower($respuestaUsuario->respuesta))) {
-                            $nota += $puntuacion;
-                        }
-                    } elseif ($pregunta->tipo === 'opciones individuales') {
-                        if ($respuestaCorrecta && trim(strtolower($respuestaCorrecta->respuesta)) === trim(strtolower($respuestaUsuario->respuesta))) {
-                            $nota += $puntuacion;
-                        }
-                    } elseif ($pregunta->tipo === 'opciones multiples') {
-                        $respuestasCorrectas = explode(',', str_replace(' ', '', strtolower($respuestaCorrecta->respuesta)));
-                        $respuestasUsuario = explode(',', str_replace(' ', '', strtolower($respuestaUsuario->respuesta)));
+                    $respuestasCorrectas = array_map('trim', explode(',', strtolower($respuestaCorrecta)));
+                    $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
-                        if (!array_diff($respuestasCorrectas, $respuestasUsuario)) {
-                            $nota += $puntuacion;
-                        }
+                    if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
+                        $nota += $pregunta->puntuacion;
+                        $correcta = true;
                     }
+
+                    $correcciones[] = [
+                        'respuestaId' => $respuestaUsuario->id,
+                        'correcta' => $correcta,
+                    ];
                 }
             }
+
+            $correcionController->postCorrecionExamen(new Request([
+                'correcciones' => $correcciones,
+            ]));
 
             $notaExamen = NotasExamen::updateOrCreate(
                 ['examenId' => $examenId, 'usuarioId' => $usuarioId],

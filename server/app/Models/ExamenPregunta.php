@@ -22,6 +22,10 @@ class ExamenPregunta extends Model
     }
     public function respuestas()
     {
-    return $this->hasManyThrough(Respuesta::class,Pregunta::class,'id','preguntaId','preguntaId', 'id');
-}
+        return $this->hasManyThrough(Respuesta::class,Pregunta::class,'id','preguntaId','preguntaId', 'id');
+    }
+    public function respuestaExamen()
+    {
+        return $this->hasMany(RespuestaExamen::class, 'preguntaId', 'preguntaId');
+    }
 }

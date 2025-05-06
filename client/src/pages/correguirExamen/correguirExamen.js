@@ -1,7 +1,7 @@
 import { postCorrecionExamen } from "../../components/correcionExamenApi"
 import { getExamenWithInfo } from "../../components/examenApi"
 import { getExamenPreguntaByExamenId } from "../../components/examenPreguntaApi"
-import { calcularNotaYGuardar } from "../../components/notaExamenApi"
+import { calcularNotaYGuardar, correguirAuto, correguirAutoTodo } from "../../components/notaExamenApi"
 
 document.addEventListener("DOMContentLoaded", async () => {
     const userId = sessionStorage.getItem("userId")
@@ -134,142 +134,135 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
 
     document.addEventListener("click", async (e) => {
+
         if (e.target.id.startsWith("finalizarCorreccion")) {
-            const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10)
-            const modal = document.getElementById(`corregirModal${usuarioId}`)
-            const checkboxes = modal.querySelectorAll("input[type='checkbox']")
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
+            const usuarioId = parseInt(e.target.id.replace("finalizarCorreccion", ""), 10);
+            const modal = document.getElementById(`corregirModal${usuarioId}`);
+            const checkboxes = modal.querySelectorAll("input[type='checkbox']");
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId)
-                const preguntas = response.examenPregunta
+                const response = await getExamenPreguntaByExamenId(examenId);
+                const preguntas = response.examenPregunta;
 
-                console.log("Preguntas obtenidas:", preguntas)
+                console.log("Preguntas obtenidas:", response);
 
                 const correcciones = Array.from(checkboxes).map((checkbox) => {
-                    const respuestaId = parseInt(checkbox.id.split("_")[1], 10)
-                    const correcta = checkbox.checked
+                    const idParts = checkbox.id.split("_");
+                    if (idParts.length < 2) {
+                        console.error(`Formato de ID inválido para el checkbox: ${checkbox.id}`);
+                        return null;
+                    }
+
+                    const respuestaExamenId = parseInt(idParts[1], 10);
+                    if (isNaN(respuestaExamenId)) {
+                        console.error(`ID de respuesta_examen inválido: ${checkbox.id}`);
+                        return null;
+                    }
+
+                    const correcta = checkbox.checked;
 
                     const pregunta = preguntas.find((p) =>
-                        Array.isArray(p.respuestas) && p.respuestas.some((r) => r.id === respuestaId)
-                    )
+                        Array.isArray(p.respuesta_examen) && p.respuesta_examen.some((r) => r.id === respuestaExamenId)
+                    );
 
                     if (!pregunta) {
-                        console.error(`No se encontró una pregunta para respuestaId: ${respuestaId}`)
-                        return null
+                        console.error(`No se encontró una pregunta para respuestaExamenId: ${respuestaExamenId}`);
+                        return null;
                     }
 
-                    const respuesta = pregunta.respuestas.find((r) => r.id === respuestaId)
+                    const respuestaExamen = pregunta.respuesta_examen.find((r) => r.id === respuestaExamenId);
+
+                    if (!respuestaExamen) {
+                        console.error(`No se encontró una respuesta_examen para respuestaExamenId: ${respuestaExamenId}`);
+                        return null;
+                    }
 
                     return {
-                        respuestaId: respuesta?.id,
+                        respuestaId: respuestaExamen.id,
                         correcta,
-                        puntuacion: pregunta ? pregunta.puntuacion : 0,
-                    }
-                }).filter((correccion) => correccion !== null)
+                    };
+                }).filter((correccion) => correccion !== null);
 
-                console.log("Correcciones a enviar:", correcciones)
+                console.log("Correcciones a enviar:", correcciones);
 
-                await postCorrecionExamen({ correcciones })
+                await postCorrecionExamen({ correcciones });
 
                 const payload = {
                     examenId,
                     usuarioId,
-                    resultados: correcciones,
-                }
+                    resultados: correcciones, // Solo se envían los resultados
+                };
 
-                console.log("Resultados de la corrección:", payload)
+                console.log("Payload enviado a calcularNotaYGuardar:", payload);
 
-                await calcularNotaYGuardar(payload)
+                await calcularNotaYGuardar(payload);
 
-                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`)
+                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`);
                 if (userNameElement) {
-                    userNameElement.style.color = "green"
+                    userNameElement.style.color = "green";
                 }
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal)
-                bootstrapModal.hide()
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
             } catch (error) {
-                console.error("Error al procesar la corrección:", error)
+                console.error("Error al procesar la corrección:", error);
             }
         }
 
         if (e.target.id.startsWith("confirmarAuto")) {
-            const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10)
-            const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`)
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
+            const usuarioId = parseInt(e.target.id.replace("confirmarAuto", ""), 10);
+            const modal = document.getElementById(`confirmacionAutoModal${usuarioId}`);
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId)
-                const preguntas = response.examenPregunta
-
-                console.log("Preguntas obtenidas:", preguntas)
-
-                const correcciones = preguntas.map((pregunta) => ({
-                    respuestaId: pregunta.respuestas[0]?.id,
-                    correcta: true,
-                    puntuacion: pregunta.puntuacion,
-                }))
-
-                console.log("Correcciones automáticas a enviar:", correcciones)
-
-                await postCorrecionExamen({ correcciones })
-
                 const payload = {
                     examenId,
                     usuarioId,
-                    resultados: correcciones,
-                }
+                };
 
-                console.log("Resultados de la corrección automática:", payload)
+                console.log("Payload enviado a correguirAuto:", payload);
 
-                await calcularNotaYGuardar(payload)
+                const response = await correguirAuto(payload);
 
-                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`)
+                console.log("Resultado de la corrección automática:", response);
+
+                const userNameElement = document.querySelector(`span[data-usuario-id="${usuarioId}"]`);
                 if (userNameElement) {
-                    userNameElement.style.color = "green"
+                    userNameElement.style.color = "green";
                 }
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal)
-                bootstrapModal.hide()
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
             } catch (error) {
-                console.error("Error al corregir automáticamente:", error)
+                console.error("Error al corregir automáticamente:", error);
             }
         }
 
         if (e.target.id === "confirmarTodo") {
-            const modal = document.getElementById("confirmacionTodoModal")
-            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10)
+            const modal = document.getElementById("confirmacionTodoModal");
+            const examenId = parseInt(modal.getAttribute("data-examen-id"), 10);
 
             try {
-                const response = await getExamenPreguntaByExamenId(examenId)
-                const preguntas = response.examenPregunta
+                const payload = {
+                    examenId,
+                };
 
-                console.log("Preguntas obtenidas:", preguntas)
+                console.log("Payload enviado a correguirAutoTodo:", payload);
 
-                const correcciones = preguntas.flatMap((pregunta) =>
-                    pregunta.respuestas.map((respuesta) => ({
-                        respuestaId: respuesta.id,
-                        correcta: true,
-                        puntuacion: pregunta.puntuacion,
-                    }))
-                )
+                const response = await correguirAutoTodo(payload);
 
-                console.log("Correcciones automáticas para todos a enviar:", correcciones)
+                console.log("Resultado de la corrección automática para todos:", response);
 
-                await postCorrecionExamen({ correcciones })
-
-                console.log("Resultados de la corrección automática para todos los usuarios.")
-
-                const userNameElements = document.querySelectorAll("span[data-usuario-id]")
+                const userNameElements = document.querySelectorAll("span[data-usuario-id]");
                 userNameElements.forEach((element) => {
-                    element.style.color = "green"
-                })
+                    element.style.color = "green";
+                });
 
-                const bootstrapModal = bootstrap.Modal.getInstance(modal)
-                bootstrapModal.hide()
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
             } catch (error) {
-                console.error("Error al corregir automáticamente todos los exámenes:", error)
+                console.error("Error al corregir automáticamente todos los exámenes:", error);
             }
         }
     })
@@ -289,8 +282,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     <p>Pregunta: ${respuesta.pregunta}</p>
                                     <p>Respuesta: ${respuesta.respuesta}</p>
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.preguntaId}">
-                                        <label class="form-check-label" for="respuesta_${respuesta.preguntaId}">Correcta</label>
+                                        <input type="checkbox" class="form-check-input" id="respuesta_${respuesta.respuestaId}">
+                                        <label class="form-check-label" for="respuesta_${respuesta.respuestaId}">Correcta</label>
                                     </div>
                                 </div>
                             `).join('')}
@@ -302,7 +295,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </div>
             </div>
-        `
+        `;
     }
 
     function confirmacionAutoModal(usuario, examenId) {

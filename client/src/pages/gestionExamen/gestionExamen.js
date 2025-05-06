@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const preguntasHtml = examen.preguntas.map(pregunta => {
             let opcionesHtml = ''
             if (pregunta.tipo === 'opciones individuales' || pregunta.tipo === 'opciones multiples') {
-                const opciones = pregunta.opciones ? pregunta.opciones.replace(/\\n/g, ', ') : 'No hay opciones disponibles'
+                const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No hay opciones disponibles'
                 opcionesHtml = `
                     <p><strong>Opciones:</strong> ${opciones}</p>
                 `

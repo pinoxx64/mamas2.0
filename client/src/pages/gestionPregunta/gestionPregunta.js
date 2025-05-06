@@ -111,7 +111,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     await postRespuesta(nuevaRespuesta)
                 }
 
-                alert("Pregunta creada exitosamente.")
                 location.reload()
             } catch (error) {
                 console.error("Error al crear la pregunta:", error)
@@ -194,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <!-- Opciones -->
                                 <div class="col-sm-12">
                                     <label for="opciones${pre.id}" class="form-label">Opciones</label>
-                                    <textarea id="opciones${pre.id}" name="opciones${pre.id}" class="form-control">${pre.opciones ? pre.opciones.replace(/\\n/g, '\n') : ''}</textarea>
+                                    <textarea id="opciones${pre.id}" name="opciones${pre.id}" class="form-control">${pre.opciones ? pre.opciones.replace(/\n/g, '\n') : ''}</textarea>
                                     <small class="text-muted">Escribe las opciones separadas por saltos de línea.</small>
                                 </div>
 
