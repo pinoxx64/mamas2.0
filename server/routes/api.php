@@ -145,6 +145,7 @@ Route::prefix('correcionExamen')->middleware('auth:sanctum')->group(function() {
 //Auth
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
+Route::put('activar/{email}', [UserController::class, 'putActivar']);
 Route::post('logout', [AuthController::class, 'logout']);
 
 Route::get('/nologin', function () {

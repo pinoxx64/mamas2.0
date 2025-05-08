@@ -36,7 +36,7 @@ class AuthController extends Controller
         try {
             $input = $request->all();
             $input['password'] = bcrypt($input['password']);
-            $input['active'] = 1;
+            $input['active'] = 0;
 
             $user = User::create($input);
             $user->remember_token = $user->createToken('LaravelSanctumAuth', ['Alumno'])->plainTextToken;
@@ -115,7 +115,8 @@ class AuthController extends Controller
                 'token' => $token,
                 'id' => $user->id,
                 'nombre' => $user->name,
-                'abilities' => $abilities
+                'abilities' => $abilities,
+                'active' => $user->active,
             ];
 
             return response()->json(["success" => true, "data" => $success, "message" => "¡Has iniciado sesión!"]);

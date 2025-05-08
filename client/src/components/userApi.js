@@ -184,3 +184,27 @@ export const putUserPhoto = async (id, photo) => {
         throw error
     }
 }
+
+export const putActivar = async (email) => {
+    const rutaUser = constantes.urlApi
+    try {
+        const respuesta = await fetch(rutaUser + 'activar/' + email, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+        })
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al activar el user. Código de estado: ${respuesta.status}`)
+        }
+
+        const resultado = await respuesta.json()
+        console.log(resultado)
+        return resultado
+    } catch (error) {
+        console.error('Error en la función putActivar:', error.message)
+        throw error
+    }
+}

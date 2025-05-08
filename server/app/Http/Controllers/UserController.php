@@ -123,4 +123,16 @@ class UserController extends Controller
         $userRol = UserRol::all();
         return response()->json(['user' => $user, 'userRol' => $userRol]);
     }
+
+    public function putActivar($email){
+        $user = user::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'user no encontrado'], 404);
+        }
+
+        $user->update(['active' => 1]);
+
+        return response()->json(['user' => $user], Response::HTTP_CREATED);
+    }
 }

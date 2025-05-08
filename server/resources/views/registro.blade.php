@@ -10,7 +10,11 @@
         <h2 style="text-align: center; color: #4CAF50;">¡Cuenta creada exitosamente!</h2>
         <p>Hola <strong>{{ $userName }}</strong>,</p>
         <p>Se ha creado una cuenta en nuestra plataforma usando tu correo electrónico: <strong>{{ $email }}</strong>.</p>
-        <p>Si no has solicitado esta cuenta, por favor ignora este mensaje. Si tienes alguna duda, no dudes en contactarnos.</p>
+        <p>Para activar la cuenta deberas activarlo en el siguiente boton</p>
+        <p>
+            <button style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">
+                <a href="http://localhost:5173/src/pages/activarRegister/activarRegister.html" style="color: white; text-decoration: none;">Activar Cuenta</a>
+        </p>
         <p>Gracias por unirte a <strong>Mamas Oficial</strong>.</p>
         <hr>
         <p style="text-align: center; font-size: 0.9em; color: #777;">
