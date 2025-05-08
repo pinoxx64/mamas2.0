@@ -1,4 +1,3 @@
-import { constantes } from "../../components/constantes";
 import { register, getIfEmailExist } from "../../components/userApi";
 
 const nameInput = document.getElementById('name');
@@ -9,84 +8,98 @@ const confirmPasswordInput = document.getElementById('confirmPassword');
 const registrarse = async () => {
     const form = document.getElementById('register-form');
 
+    // Validar el campo de nombre
     nameInput.addEventListener('input', () => {
-        const name = nameInput.value;
         let errores = [];
-        if (!constantes.nameValid.test(name)) {
-            errores.push("El nombre debe tener entre 2 y 50 caracteres");
+        if (!nameInput.validity.valid) {
+            if (nameInput.validity.tooShort) {
+                errores.push("El nombre debe tener al menos 2 caracteres.");
+            }
+            if (nameInput.validity.tooLong) {
+                errores.push("El nombre no puede tener más de 50 caracteres.");
+            }
+            if (nameInput.validity.valueMissing) {
+                errores.push("El nombre es obligatorio.");
+            }
         }
         mostrarErrores(errores, nameInput);
     });
 
+    // Validar el campo de correo electrónico
     emailInput.addEventListener('input', () => {
-        const email = emailInput.value;
         let errores = [];
-        if (!constantes.emailValid.test(email)) {
-            errores.push("El correo debe ser un correo válido");
+        if (!emailInput.validity.valid) {
+            if (emailInput.validity.typeMismatch) {
+                errores.push("El correo debe ser un correo válido.");
+            }
+            if (emailInput.validity.valueMissing) {
+                errores.push("El correo es obligatorio.");
+            }
         }
         mostrarErrores(errores, emailInput);
     });
 
+    // Validar el campo de contraseña
     passwordInput.addEventListener('input', () => {
-        const password = passwordInput.value;
         let errores = [];
-        if (!/.{8,}/.test(password)) {
-            errores.push("Debe tener al menos 8 caracteres");
-        }
-        if (!/[A-Z]/.test(password)) {
-            errores.push("Debe contener al menos una letra mayúscula");
-        }
-        if (!/[a-z]/.test(password)) {
-            errores.push("Debe contener al menos una letra minúscula");
-        }
-        if (!/\d/.test(password)) {
-            errores.push("Debe contener al menos un número");
-        }
-        if (!/[\W_]/.test(password)) {
-            errores.push("Debe contener al menos un carácter especial (por ejemplo: !, @, #, ...)");
+        if (!passwordInput.validity.valid) {
+            if (passwordInput.validity.tooShort) {
+                errores.push("La contraseña debe tener al menos 8 caracteres.");
+            }
+            if (passwordInput.validity.valueMissing) {
+                errores.push("La contraseña es obligatoria.");
+            }
         }
         mostrarErrores(errores, passwordInput);
     });
 
+    // Validar el campo de confirmación de contraseña
+    confirmPasswordInput.addEventListener('input', () => {
+        let errores = [];
+        if (confirmPasswordInput.value !== passwordInput.value) {
+            errores.push("Las contraseñas no coinciden.");
+        }
+        mostrarErrores(errores, confirmPasswordInput);
+    });
+
+    // Validar el formulario al enviarlo
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         let submitError = false;
         const email = emailInput.value;
-
         try {
-            console.log('entra en el try')
             const emailExist = await getIfEmailExist(email);
-            console.log(emailExist)
             if (emailExist == 1) {
                 const errores = ['El correo electrónico ya está en uso'];
                 mostrarErrores(errores, emailInput);
                 submitError = true;
             }
+        } catch (error) {
+            console.error('Error al verificar el correo:', error.message);
+        }
 
+        if (confirmPasswordInput.value !== passwordInput.value) {
+            const errores = ["Las contraseñas no coinciden."];
+            mostrarErrores(errores, confirmPasswordInput);
+            submitError = true;
+        }
+
+        if (!submitError && form.checkValidity()) {
             const formData = new FormData(form);
-            const password = formData.get('password');
-            const confirmPassword = formData.get('confirmPassword');
-            let errores = [];
-            if (password !== confirmPassword) {
-                errores.push("Las contraseñas no coinciden.");
-                mostrarErrores(errores, confirmPasswordInput);
-                submitError = true;
-            }
-            console.log(submitError)
-            if (!submitError) {
-                const user = {
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    password: password
-                };
-                console.log(user)
+            const user = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+            };
+
+            try {
                 await register(user);
                 window.location.href = '../login/login.html';
                 form.reset();
+            } catch (error) {
+                console.error('Error al registrar:', error.message);
             }
-        } catch (error) {
-            console.error('Error', error.message);
         }
     });
 };

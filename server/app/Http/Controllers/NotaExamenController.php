@@ -172,7 +172,7 @@ class NotaExamenController extends Controller
         }
 
         $preguntas = ExamenPregunta::where('examenId', $examenId)
-            ->with('pregunta')
+            ->with(['pregunta.respuestas'])
             ->get();
 
         $nota = 0;
@@ -183,9 +183,10 @@ class NotaExamenController extends Controller
             $correcta = false;
 
             if ($pregunta) {
-                $respuestaCorrecta = $pregunta->pregunta->respuesta_correcta;
+                $respuestasCorrectas = $pregunta->pregunta->respuestas->pluck('respuesta')->map(function ($respuesta) {
+                    return trim(strtolower($respuesta));
+                })->toArray();
 
-                $respuestasCorrectas = array_map('trim', explode(',', strtolower($respuestaCorrecta)));
                 $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
                 if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
@@ -213,7 +214,7 @@ class NotaExamenController extends Controller
         return response()->json([
             'message' => 'Corrección automática realizada correctamente',
             'nota' => $nota,
-            'correcciones' => $correcciones,
+            'correcciones' => $correcciones
         ], Response::HTTP_OK);
     }
 
@@ -239,7 +240,7 @@ class NotaExamenController extends Controller
         }
 
         $preguntas = ExamenPregunta::where('examenId', $examenId)
-            ->with('pregunta')
+            ->with(['pregunta.respuestas'])
             ->get();
 
         $notasGuardadas = [];
@@ -262,9 +263,10 @@ class NotaExamenController extends Controller
                 $correcta = false;
 
                 if ($pregunta) {
-                    $respuestaCorrecta = $pregunta->pregunta->respuesta_correcta;
+                    $respuestasCorrectas = $pregunta->pregunta->respuestas->map(function ($respuesta) {
+                        return trim(strtolower($respuesta->respuesta));
+                    })->toArray();
 
-                    $respuestasCorrectas = array_map('trim', explode(',', strtolower($respuestaCorrecta)));
                     $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
                     if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
