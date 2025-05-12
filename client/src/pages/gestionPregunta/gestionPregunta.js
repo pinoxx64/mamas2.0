@@ -30,92 +30,229 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     })
 
-    const agregarOpcionBtn = document.getElementById("agregarOpcion")
-    const opcionesCampos = document.getElementById("opcionesCampos")
+    // const agregarOpcionBtn = document.getElementById("agregarOpcion")
+    // const opcionesCampos = document.getElementById("opcionesCampos")
+    // agregarOpcionBtn.addEventListener("click", function () {
+    //     const opcionDiv = document.createElement("div")
+    //     opcionDiv.classList.add("input-group", "mb-2")
+    //     opcionDiv.innerHTML = `
+    //         <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
+    //         <input type="text" class="form-control" placeholder="Escribe una opción">
+    //         <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
+    //     `
+    //     opcionesCampos.appendChild(opcionDiv)
+    //     opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
+    //         opcionDiv.remove()
+    //     })
+    // })
+
+    const agregarOpcionBtn = document.getElementById("agregarOpcion");
+    const opcionesCampos = document.getElementById("opcionesCampos");
+
     agregarOpcionBtn.addEventListener("click", function () {
-        const opcionDiv = document.createElement("div")
-        opcionDiv.classList.add("input-group", "mb-2")
+        const opcionDiv = document.createElement("div");
+        opcionDiv.classList.add("input-group", "mb-2");
+
+        // Contar las opciones existentes para determinar el prefijo (a., b., c., etc.)
+        const totalOpciones = opcionesCampos.querySelectorAll(".input-group").length;
+        const prefijo = String.fromCharCode(97 + totalOpciones) + "."; // Genera 'a.', 'b.', 'c.', etc.
+
         opcionDiv.innerHTML = `
-            <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
-            <input type="text" class="form-control" placeholder="Escribe una opción">
-            <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
-        `
-        opcionesCampos.appendChild(opcionDiv)
+        <span class="input-group-text">${prefijo}</span>
+        <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
+        <input type="text" class="form-control" placeholder="Escribe una opción">
+        <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
+    `;
+        opcionesCampos.appendChild(opcionDiv);
+
+        // Agregar evento para eliminar la opción
         opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
-            opcionDiv.remove()
-        })
-    })
+            opcionDiv.remove();
+
+            // Actualizar los prefijos después de eliminar una opción
+            actualizarPrefijos();
+        });
+    });
+
+    // Función para actualizar los prefijos de las opciones
+    function actualizarPrefijos() {
+        const opciones = opcionesCampos.querySelectorAll(".input-group");
+        opciones.forEach((opcionDiv, index) => {
+            const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+            const span = opcionDiv.querySelector(".input-group-text");
+            if (span) {
+                span.textContent = prefijo;
+            }
+        });
+    }
 
     //Función para crear una nueva pregunta
 
     async function crearPreguntaUI() {
         const guardarPreguntaBtn = document.getElementById("guardarPregunta")
 
+        // guardarPreguntaBtn.addEventListener("click", async () => {
+        //     try {
+        //         const tipo = tipoPreguntaSelect.value;
+        //         const pregunta = document.getElementById("pregunta").value;
+        //         const asignaturaId = asignaturaSelect.value;
+
+        //         let opciones = [];
+        //         let respuesta = null;
+        //         let tipoPregunta = tipo;
+
+        //         if (tipo === "opciones") {
+        //             const opcionesInputs = opcionesCampos.querySelectorAll(".input-group");
+        //             opciones = Array.from(opcionesInputs).map((opcionDiv, index) => {
+        //                 const texto = opcionDiv.querySelector("input[type='text']").value;
+        //                 const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
+        //                 const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+        //                 return { texto: `${prefijo} ${texto}`, seleccionado };
+        //             });
+
+        //             const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
+        //             if (opcionesSeleccionadas.length === 1) {
+        //                 respuesta = opcionesSeleccionadas[0].texto; // Guardar la respuesta con el prefijo
+        //                 opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+        //                 tipoPregunta = "opciones individuales";
+        //             } else if (opcionesSeleccionadas.length > 1) {
+        //                 respuesta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", "); // Respuestas múltiples con prefijos
+        //                 opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+        //                 tipoPregunta = "opciones multiples";
+        //             }
+        //         } else {
+        //             respuesta = document.getElementById("respuesta").value;
+        //         }
+
+        //         const nuevaPregunta = {
+        //             tipo: tipoPregunta,
+        //             pregunta: pregunta,
+        //             asignaturaId: asignaturaId,
+        //             opciones: opciones.length > 0 ? opciones.join("\n") : null, // Guardar opciones separadas por saltos de línea
+        //         };
+
+        //         console.log("Nueva Pregunta:", nuevaPregunta);
+        //         const preguntaCreada = await postPregunta(nuevaPregunta);
+
+        //         if (tipoPregunta === "opciones individuales" || tipoPregunta === "opciones multiples") {
+        //             const respuestas = respuesta.split(", ");
+        //             respuestas.forEach(async (res) => {
+        //                 const nuevaRespuesta = {
+        //                     respuesta: res.trim(),
+        //                     preguntaId: preguntaCreada.pregunta.id,
+        //                 };
+        //                 console.log("Nueva Respuesta:", nuevaRespuesta);
+        //                 await postRespuesta(nuevaRespuesta);
+        //             });
+        //         } else {
+        //             const nuevaRespuesta = {
+        //                 respuesta: respuesta,
+        //                 preguntaId: preguntaCreada.pregunta.id,
+        //             };
+        //             console.log("Nueva Respuesta:", nuevaRespuesta);
+        //             await postRespuesta(nuevaRespuesta);
+        //         }
+
+        //         location.reload();
+        //     } catch (error) {
+        //         console.error("Error al crear la pregunta:", error);
+        //     }
+        // });
+
         guardarPreguntaBtn.addEventListener("click", async () => {
             try {
-                const tipo = tipoPreguntaSelect.value
-                const pregunta = document.getElementById("pregunta").value
-                const asignaturaId = asignaturaSelect.value
+                const tipo = tipoPreguntaSelect.value;
+                const pregunta = document.getElementById("pregunta").value;
+                const asignaturaId = asignaturaSelect.value;
 
-                let opciones = []
-                let respuesta = null
-                let tipoPregunta = tipo
+                let opciones = [];
+                let respuesta = null;
+                let tipoPregunta = tipo;
 
                 if (tipo === "opciones") {
-                    const opcionesInputs = opcionesCampos.querySelectorAll(".input-group")
-                    opciones = Array.from(opcionesInputs).map(opcionDiv => {
-                        const texto = opcionDiv.querySelector("input[type='text']").value
-                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked
-                        return { texto, seleccionado }
-                    })
-                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado)
+                    const opcionesInputs = opcionesCampos.querySelectorAll(".input-group");
+                    opciones = Array.from(opcionesInputs).map((opcionDiv, index) => {
+                        const texto = opcionDiv.querySelector("input[type='text']").value;
+                        const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
+                        const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+                        return { texto: `${prefijo} ${texto}`, seleccionado };
+                    });
+
+                    const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
                     if (opcionesSeleccionadas.length === 1) {
-                        respuesta = opcionesSeleccionadas[0].texto.charAt(0)
-                        opciones = opciones.map(opcion => opcion.texto)
-                        tipoPregunta = "opciones individuales"
+                        respuesta = opcionesSeleccionadas[0].texto; // Guardar la respuesta con el prefijo
+                        opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+                        tipoPregunta = "opciones individuales";
                     } else if (opcionesSeleccionadas.length > 1) {
-                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto.charAt(0)).join(", ")
-                        opciones = opciones.map(opcion => opcion.texto)
-                        tipoPregunta = "opciones multiples"
+                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", "); // Respuestas múltiples con prefijos
+                        opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+                        tipoPregunta = "opciones multiples";
                     }
                 } else {
-                    respuesta = document.getElementById("respuesta").value
+                    respuesta = document.getElementById("respuesta").value;
                 }
 
                 const nuevaPregunta = {
                     tipo: tipoPregunta,
                     pregunta: pregunta,
                     asignaturaId: asignaturaId,
-                    opciones: opciones.length > 0 ? opciones.join("\n") : null,
-                }
+                    opciones: opciones.length > 0 ? opciones.join("\n") : null, // Guardar opciones separadas por saltos de línea
+                };
 
-                console.log("Nueva Pregunta:", nuevaPregunta)
-                const preguntaCreada = await postPregunta(nuevaPregunta)
+                console.log("Nueva Pregunta:", nuevaPregunta);
+                const preguntaCreada = await postPregunta(nuevaPregunta);
 
                 if (tipoPregunta === "opciones individuales" || tipoPregunta === "opciones multiples") {
-                    const respuestas = respuesta.split(", ")
+                    const respuestas = respuesta.split(", ");
                     respuestas.forEach(async (res) => {
                         const nuevaRespuesta = {
                             respuesta: res.trim(),
-                            preguntaId: preguntaCreada.pregunta.id
-                        }
-                        console.log("Nueva Respuesta:", nuevaRespuesta)
-                        await postRespuesta(nuevaRespuesta)
-                    })
-                }else{
+                            preguntaId: preguntaCreada.pregunta.id,
+                        };
+                        console.log("Nueva Respuesta:", nuevaRespuesta);
+                        await postRespuesta(nuevaRespuesta);
+                    });
+                } else {
                     const nuevaRespuesta = {
                         respuesta: respuesta,
-                        preguntaId: preguntaCreada.pregunta.id
-                    }
-                    console.log("Nueva Respuesta:", nuevaRespuesta)
-                    await postRespuesta(nuevaRespuesta)
+                        preguntaId: preguntaCreada.pregunta.id,
+                    };
+                    console.log("Nueva Respuesta:", nuevaRespuesta);
+                    await postRespuesta(nuevaRespuesta);
                 }
 
-                location.reload()
+                // Agregar la nueva pregunta a la tabla sin recargar la página
+                const tabla = $('#Preguntas').DataTable();
+                const asignaturaNombre = asignaturas.asignatura.find(asignatura => asignatura.id == asignaturaId)?.nombre || 'Sin asignatura';
+                const opcionesTexto = opciones.length > 0 ? opciones.join(", ") : 'No tiene opciones';
+
+                const nuevaFila = tabla.row.add([
+                    tipoPregunta,
+                    pregunta,
+                    opcionesTexto,
+                    asignaturaNombre,
+                    respuesta.split(", ").join("<br>"),
+                    `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${preguntaCreada.pregunta.id}"><i class="fas fa-edit"></i> Editar</button>`
+                ]).draw(false).node();
+
+                $(nuevaFila).attr('data-id', preguntaCreada.pregunta.id);
+
+                // Limpiar el formulario y cerrar el modal
+                document.getElementById("pregunta").value = "";
+                document.getElementById("respuesta").value = "";
+                opcionesCampos.innerHTML = "";
+                opcionesContainer.classList.add("d-none");
+
+                const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"));
+                if (crearPreguntaModal) {
+                    crearPreguntaModal.hide();
+                }
+
+                console.log("Pregunta agregada a la tabla.");
             } catch (error) {
-                console.error("Error al crear la pregunta:", error)
+                console.error("Error al crear la pregunta:", error);
             }
-        })
+        });
     }
 
     // Función para rellenar la tabla de preguntas
@@ -124,7 +261,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const preguntasWithRespuestas = await getPreguntasWithRespuestas();
         console.log(preguntasWithRespuestas.preguntas);
         const preguntas = preguntasWithRespuestas.preguntas;
-    
+
         const tabla = $('#Preguntas').DataTable();
         tabla.clear().draw();
         preguntas.forEach(pre => {
@@ -132,14 +269,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             pre.respuestas.forEach(res => {
                 respuestas += res.respuesta + '<br>';
             });
-    
+
             let opciones = '';
             if (pre.opciones) {
                 opciones = pre.opciones.replace(/\n/g, ', ');
             } else {
                 opciones = 'No tiene opciones';
             }
-    
+
             const row = tabla.row.add([
                 pre.tipo,
                 pre.pregunta,
@@ -148,9 +285,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 respuestas,
                 `<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#myModal${pre.id}"><i class="fas fa-edit"></i> Editar</button>`
             ]).draw(false).node();
-    
+
             $(row).attr('data-id', pre.id);
-    
+
             document.body.insertAdjacentHTML('beforeend', editarPreguntaModal(pre, asignaturas));
             editarPreguntaUI(pre);
         });
@@ -227,7 +364,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function editarPreguntaUI(pre) {
         const modificarBtn = document.getElementById(`guardarBtn${pre.id}`);
-    
+
         if (modificarBtn) {
             modificarBtn.addEventListener('click', async () => {
                 try {
@@ -237,26 +374,26 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const asignaturaId = document.getElementById(`asignatura${pre.id}`).value;
                     const respuestaInput = document.getElementById(`respuesta${pre.id}`).value;
                     let opciones = document.getElementById(`opciones${pre.id}`).value;
-    
+
                     console.log(tipo, pregunta, asignaturaId, respuestaInput, opciones);
-    
+
                     if (tipo === 'texto' || tipo === 'números') {
                         opciones = null;
                     }
-    
+
                     const preguntaCambiada = {
                         tipo: tipo,
                         pregunta: pregunta,
                         asignaturaId: asignaturaId,
                         opciones: opciones,
                     };
-    
+
                     console.log("Pregunta actualizada:", preguntaCambiada);
                     await putPregunta(pre.id, preguntaCambiada);
-    
+
                     if (tipo === 'opciones multiples' || tipo === 'opciones individuales') {
                         const respuestas = respuestaInput.split(',').map(res => res.trim());
-    
+
                         for (let i = 0; i < pre.respuestas.length; i++) {
                             const respuestaExistente = pre.respuestas[i];
                             if (respuestas[i]) {
@@ -271,7 +408,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 await deleteRespuesta(respuestaExistente.id);
                             }
                         }
-    
+
                         for (let i = pre.respuestas.length; i < respuestas.length; i++) {
                             const nuevaRespuesta = {
                                 respuesta: respuestas[i],
@@ -297,20 +434,20 @@ document.addEventListener("DOMContentLoaded", async function () {
                             await postRespuesta(nuevaRespuesta);
                         }
                     }
-    
+
                     const asignaturaNombre = asignaturas.asignatura.find(asignatura => asignatura.id == asignaturaId)?.nombre || 'Sin asignatura';
-    
+
                     const tabla = $('#Preguntas').DataTable();
                     const row = tabla.row(`[data-id="${pre.id}"]`);
-    
+
                     if (!row.node()) {
                         console.error(`No se encontró la fila con id: ${pre.id}`);
                         return;
                     }
-    
+
                     const respuestas = respuestaInput.split(',').map(res => res.trim()).join('<br>');
                     const opcionesTexto = opciones ? opciones.replace(/\n/g, ', ') : 'No tiene opciones';
-    
+
                     row.data([
                         tipo,
                         pregunta,
@@ -319,7 +456,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         respuestas,
                         row.data()[5],
                     ]).draw(false);
-    
+
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.hide();
