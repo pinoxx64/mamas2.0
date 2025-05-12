@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 ]).draw(false).node();
 
                 document.body.insertAdjacentHTML('beforeend', deleteExamen(examen))
-                activeOrDesableExamenUI(examen.id, 'disable')
+                activeOrDesableExamenUI(examen.id, 'disable', examen)
 
                 document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 ]).draw(false).node();
 
                 document.body.insertAdjacentHTML('beforeend', activeExamen(examen))
-                activeOrDesableExamenUI(examen.id, 'active')
+                activeOrDesableExamenUI(examen.id, 'active', examen)
 
                 document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
                 mostrarPreguntasExamen(examen)
@@ -549,7 +549,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
-    async function activeOrDesableExamenUI(id, estado) {
+    async function activeOrDesableExamenUI(id, estado, examen) {
+        console.log("examen", examen)
         const confirmarActiveOrDesable = document.getElementById(`confirmarActiveOrDesable${id}`);
 
         if (confirmarActiveOrDesable) {
@@ -581,7 +582,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${id}"><i class="fas fa-edit"></i> Desactivar examen</button>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
                             `
-                        ]).draw(false);
+                        ]).draw(false).node();
+
+                        document.body.insertAdjacentHTML('beforeend', deleteExamen(examen))
+                        activeOrDesableExamenUI(id, 'disable', examen)
+
+                        document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
+
+                        $(row).attr('data-id', id);
                     } else {
                         row.data([
                             rowData[0],
@@ -593,7 +601,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${id}"><i class="fas fa-edit"></i> Activar examen</button>
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
                             `
-                        ]).draw(false);
+                        ]).draw(false).node();
+
+                        document.body.insertAdjacentHTML('beforeend', activeExamen(examen))
+                        activeOrDesableExamenUI(id, 'active', examen)
+
+                        document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examen))
+                        mostrarPreguntasExamen(examen)
+
+                        document.body.insertAdjacentHTML('beforeend', editarExamenModal(examen))
+                        editarExamenUI(examen)
+
+                        $(row).attr('data-id', id);
                     }
 
                     const modalElement = document.getElementById(estado === 'active' ? `activeModal${id}` : `deleteModal${id}`);
