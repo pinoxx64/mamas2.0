@@ -122,14 +122,59 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Funcion que contiene el modal para ver las preguntas de cada examen 
 
+    // function verPreguntasModal(examen) {
+    //     const preguntasHtml = examen.preguntas.map(pregunta => {
+    //         let opcionesHtml = ''
+    //         if (pregunta.tipo === 'opciones individuales' || pregunta.tipo === 'opciones multiples') {
+    //             const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No hay opciones disponibles'
+    //             opcionesHtml = `
+    //                 <p><strong>Opciones:</strong> ${opciones}</p>
+    //             `
+    //         }
+
+    //         return `
+    //         <li class="list-group-item d-flex justify-content-between align-items-center">
+    //             <div>
+    //                 <strong>${pregunta.tipo}:</strong> ${pregunta.pregunta}
+    //                 ${opcionesHtml}
+    //             </div>
+    //             <input type="checkbox" class="form-check-input checkboxPregunta" data-id="${pregunta.id}" title="Seleccionar para eliminar">
+    //         </li>
+    //         `
+    //     }).join('')
+
+    //     return `
+    //         <div class="modal fade" id="viewModal${examen.id}" tabindex="-1" aria-labelledby="viewModalLabel${examen.id}" aria-hidden="true">
+    //             <div class="modal-dialog modal-lg">
+    //                 <div class="modal-content">
+    //                     <div class="modal-header">
+    //                         <h5 class="modal-title" id="viewModalLabel${examen.id}">Preguntas del examen: ${examen.nombre}</h5>
+    //                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    //                     </div>
+    //                     <div class="modal-body">
+    //                         <ul class="list-group">
+    //                             ${preguntasHtml}
+    //                         </ul>
+    //                     </div>
+    //                     <div class="modal-footer">
+    //                         <button type="button" class="btn btn-primary" id="guardarCambiosPreguntas${examen.id}">Eliminar Preguntas Seleccionadas</button>
+    //                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     `
+    // }
+
     function verPreguntasModal(examen) {
-        const preguntasHtml = examen.preguntas.map(pregunta => {
-            let opcionesHtml = ''
+    const preguntasHtml = Array.isArray(examen.preguntas) && examen.preguntas.length > 0
+        ? examen.preguntas.map(pregunta => {
+            let opcionesHtml = '';
             if (pregunta.tipo === 'opciones individuales' || pregunta.tipo === 'opciones multiples') {
-                const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No hay opciones disponibles'
+                const opciones = pregunta.opciones ? pregunta.opciones.replace(/\n/g, ', ') : 'No hay opciones disponibles';
                 opcionesHtml = `
                     <p><strong>Opciones:</strong> ${opciones}</p>
-                `
+                `;
             }
 
             return `
@@ -140,31 +185,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                 </div>
                 <input type="checkbox" class="form-check-input checkboxPregunta" data-id="${pregunta.id}" title="Seleccionar para eliminar">
             </li>
-            `
+            `;
         }).join('')
+        : '<p class="text-muted">No hay preguntas disponibles para este examen.</p>';
 
-        return `
-            <div class="modal fade" id="viewModal${examen.id}" tabindex="-1" aria-labelledby="viewModalLabel${examen.id}" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="viewModalLabel${examen.id}">Preguntas del examen: ${examen.nombre}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <ul class="list-group">
-                                ${preguntasHtml}
-                            </ul>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="guardarCambiosPreguntas${examen.id}">Eliminar Preguntas Seleccionadas</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        </div>
+    return `
+        <div class="modal fade" id="viewModal${examen.id}" tabindex="-1" aria-labelledby="viewModalLabel${examen.id}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewModalLabel${examen.id}">Preguntas del examen: ${examen.nombre}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            ${preguntasHtml}
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="guardarCambiosPreguntas${examen.id}">Eliminar Preguntas Seleccionadas</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>
-        `
-    }
+        </div>
+    `;
+}
 
     // Editar examen
 
@@ -235,23 +281,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         })
 
-        // const agregarOpcionBtn = document.getElementById("agregarOpcion")
-        // const opcionesCampos = document.getElementById("opcionesCampos")
-
-        // agregarOpcionBtn.addEventListener("click", function () {
-        //     const opcionDiv = document.createElement("div")
-        //     opcionDiv.classList.add("input-group", "mb-2")
-        //     opcionDiv.innerHTML = `
-        //         <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
-        //         <input type="text" class="form-control" placeholder="Escribe una opción">
-        //         <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
-        //     `
-        //     opcionesCampos.appendChild(opcionDiv)
-
-        //     opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
-        //         opcionDiv.remove()
-        //     })
-        // })
         const agregarOpcionBtn = document.getElementById("agregarOpcion");
         const opcionesCampos = document.getElementById("opcionesCampos");
 
@@ -259,9 +288,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             const opcionDiv = document.createElement("div");
             opcionDiv.classList.add("input-group", "mb-2");
 
-            // Contar las opciones existentes para determinar el prefijo (a., b., c., etc.)
             const totalOpciones = opcionesCampos.querySelectorAll(".input-group").length;
-            const prefijo = String.fromCharCode(97 + totalOpciones) + "."; // Genera 'a.', 'b.', 'c.', etc.
+            const prefijo = String.fromCharCode(97 + totalOpciones) + ".";
 
             opcionDiv.innerHTML = `
         <span class="input-group-text">${prefijo}</span>
@@ -271,111 +299,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     `;
             opcionesCampos.appendChild(opcionDiv);
 
-            // Agregar evento para eliminar la opción
             opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
                 opcionDiv.remove();
-
-                // Actualizar los prefijos después de eliminar una opción
                 actualizarPrefijos();
             });
         });
 
-        // Función para actualizar los prefijos de las opciones
         function actualizarPrefijos() {
             const opciones = opcionesCampos.querySelectorAll(".input-group");
             opciones.forEach((opcionDiv, index) => {
-                const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+                const prefijo = String.fromCharCode(97 + index) + ".";
                 const span = opcionDiv.querySelector(".input-group-text");
                 if (span) {
                     span.textContent = prefijo;
                 }
             });
         }
-
-        //
-
-        // const guardarPreguntaBtn = document.getElementById("guardarPregunta")
-        // guardarPreguntaBtn.addEventListener("click", async () => {
-        //     try {
-        //         const tipo = document.getElementById("tipoPregunta").value;
-        //         const pregunta = document.getElementById("pregunta").value;
-        //         const asignaturaId = document.getElementById("asignaturaExamen").value;
-
-        //         let opciones = [];
-        //         let respuestaPregunta = null;
-        //         let tipoPregunta = tipo;
-
-        //         if (tipo === "opciones") {
-        //             const opcionesInputs = document.querySelectorAll("#opcionesCampos .input-group");
-        //             opciones = Array.from(opcionesInputs).map(opcionDiv => {
-        //                 const texto = opcionDiv.querySelector("input[type='text']").value;
-        //                 const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
-        //                 return { texto, seleccionado };
-        //             });
-
-        //             const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
-        //             if (opcionesSeleccionadas.length === 1) {
-        //                 respuestaPregunta = opcionesSeleccionadas[0].texto;
-        //                 opciones = opciones.map(opcion => opcion.texto);
-        //                 tipoPregunta = "opciones individuales";
-        //             } else if (opcionesSeleccionadas.length > 1) {
-        //                 respuestaPregunta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ");
-        //                 opciones = opciones.map(opcion => opcion.texto);
-        //                 tipoPregunta = "opciones multiples";
-        //             }
-        //         } else {
-        //             respuestaPregunta = document.getElementById("respuesta").value;
-        //         }
-
-        //         const nuevaPregunta = {
-        //             tipo: tipoPregunta,
-        //             pregunta,
-        //             asignaturaId,
-        //             opciones: opciones.length > 0 ? opciones.join("\n") : null,
-        //         };
-
-        //         console.log("Nueva Pregunta:", nuevaPregunta);
-        //         const respuesta = await postPregunta(nuevaPregunta);
-
-        //         const nuevaRespuesta = {
-        //             respuesta: respuestaPregunta,
-        //             preguntaId: respuesta.pregunta.id,
-        //         };
-
-        //         console.log("Nueva Respuesta:", nuevaRespuesta);
-        //         await postRespuesta(nuevaRespuesta);
-
-        //         preguntasExamen.push({ id: respuesta.pregunta.id, puntuacion: 0 });
-
-        //         document.getElementById("preguntasExamen").innerHTML += `
-        //             <li class="list-group-item d-flex justify-content-between align-items-center">
-        //                 <div>
-        //                     <strong>${tipoPregunta}:</strong> ${pregunta}
-        //                     ${opciones.length > 0 ? `<p><strong>Opciones:</strong> ${opciones.join(", ")}</p>` : ""}
-        //                 </div>
-        //                 <div class="d-flex align-items-center">
-        //                     <label for="puntuacion-${respuesta.pregunta.id}" class="me-2">Puntuación:</label>
-        //                     <input type="number" class="form-control puntuacion-input" id="puntuacion-${respuesta.pregunta.id}" data-id="${respuesta.pregunta.id}" value="1" min="0" style="width: 80px;">
-        //                 </div>
-        //             </li>
-        //         `;
-
-        //         const crearPreguntaModal = bootstrap.Modal.getInstance(document.getElementById("crearPreguntaModal"));
-        //         crearPreguntaModal.hide();
-
-        //         document.getElementById("pregunta").value = "";
-        //         document.getElementById("respuesta").value = "";
-        //         opcionesCampos.innerHTML = `
-        //             <div class="input-group mb-2">
-        //                 <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
-        //                 <input type="text" class="form-control" placeholder="Escribe una opción">
-        //             </div>
-        //         `;
-        //         opcionesContainer.classList.add("d-none");
-        //     } catch (error) {
-        //         console.error("Error al guardar la pregunta:", error);
-        //     }
-        // });
 
         const guardarPreguntaBtn = document.getElementById("guardarPregunta");
         guardarPreguntaBtn.addEventListener("click", async () => {
@@ -511,42 +450,117 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         const guardarExamenBtn = document.getElementById("guardarExamenBtn")
+        // guardarExamenBtn.addEventListener("click", async () => {
+        //     try {
+        //         const nombre = document.getElementById("nombreExamen").value;
+        //         const fhInicio = document.getElementById("fechaInicio").value;
+        //         const fhFinal = document.getElementById("fechaFin").value;
+        //         const asignaturaId = document.getElementById("asignaturaExamen").value;
+        //         const creadorId = sessionStorage.getItem("userId");
+
+        //         const nuevoExamen = {
+        //             nombre,
+        //             fhInicio,
+        //             fhFinal,
+        //             usuarioId: creadorId,
+        //             asignaturaId,
+        //             active: 0,
+        //         };
+        //         console.log("Nuevo Examen:", nuevoExamen);
+        //         const examenCreado = await postExamen(nuevoExamen);
+
+        //         const puntuacionesInputs = document.querySelectorAll(".puntuacion-input");
+        //         for (const input of puntuacionesInputs) {
+        //             const preguntaId = input.getAttribute("data-id");
+        //             const puntuacion = parseFloat(input.value);
+
+        //             await postExamenPregunta({
+        //                 examenId: examenCreado.examen.id,
+        //                 preguntaId: preguntaId,
+        //                 puntuacion: puntuacion,
+        //             });
+        //         }
+
+        //         location.reload();
+        //     } catch (error) {
+        //         console.error("Error al guardar el examen:", error);
+        //     }
+        // })
         guardarExamenBtn.addEventListener("click", async () => {
-            try {
-                const nombre = document.getElementById("nombreExamen").value;
-                const fhInicio = document.getElementById("fechaInicio").value;
-                const fhFinal = document.getElementById("fechaFin").value;
-                const asignaturaId = document.getElementById("asignaturaExamen").value;
-                const creadorId = sessionStorage.getItem("userId");
+    try {
+        const nombre = document.getElementById("nombreExamen").value;
+        const fhInicio = document.getElementById("fechaInicio").value;
+        const fhFinal = document.getElementById("fechaFin").value;
+        const asignaturaId = document.getElementById("asignaturaExamen").value;
+        const creadorId = sessionStorage.getItem("userId");
 
-                const nuevoExamen = {
-                    nombre,
-                    fhInicio,
-                    fhFinal,
-                    usuarioId: creadorId,
-                    asignaturaId,
-                    active: 0,
-                };
-                console.log("Nuevo Examen:", nuevoExamen);
-                const examenCreado = await postExamen(nuevoExamen);
+        const nuevoExamen = {
+            nombre,
+            fhInicio,
+            fhFinal,
+            usuarioId: creadorId,
+            asignaturaId,
+            active: 0,
+        };
 
-                const puntuacionesInputs = document.querySelectorAll(".puntuacion-input");
-                for (const input of puntuacionesInputs) {
-                    const preguntaId = input.getAttribute("data-id");
-                    const puntuacion = parseFloat(input.value);
+        console.log("Nuevo Examen:", nuevoExamen);
+        const examenCreado = await postExamen(nuevoExamen);
 
-                    await postExamenPregunta({
-                        examenId: examenCreado.examen.id,
-                        preguntaId: preguntaId,
-                        puntuacion: puntuacion,
-                    });
-                }
+        const puntuacionesInputs = document.querySelectorAll(".puntuacion-input");
+        for (const input of puntuacionesInputs) {
+            const preguntaId = input.getAttribute("data-id");
+            const puntuacion = parseFloat(input.value);
 
-                location.reload();
-            } catch (error) {
-                console.error("Error al guardar el examen:", error);
-            }
-        })
+            await postExamenPregunta({
+                examenId: examenCreado.examen.id,
+                preguntaId: preguntaId,
+                puntuacion: puntuacion,
+            });
+        }
+
+        // Agregar el nuevo examen a la tabla sin recargar la página
+        const tabla = $('#Examenes').DataTable();
+        const asignaturaNombre = asignaturas.asignatura.find(asig => asig.id === asignaturaId)?.nombre || "Sin asignatura";
+
+        const row = tabla.row.add([
+            nombre,
+            fhInicio,
+            fhFinal,
+            asignaturaNombre,
+            `
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editarExamenModal${examenCreado.examen.id}"><i class="fas fa-edit"></i> Editar examen</button>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${examenCreado.examen.id}"><i class="fas fa-edit"></i> Activar examen</button>
+            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${examenCreado.examen.id}">Ver preguntas</button>
+            `
+        ]).draw(false).node();
+
+        // Insertar los modales dinámicamente
+        document.body.insertAdjacentHTML('beforeend', activeExamen(examenCreado.examen));
+        document.body.insertAdjacentHTML('beforeend', editarExamenModal(examenCreado.examen));
+        document.body.insertAdjacentHTML('beforeend', verPreguntasModal(examenCreado.examen));
+
+        // Reasignar eventos a los botones de la nueva fila
+        activeOrDesableExamenUI(examenCreado.examen.id, 'active', examenCreado.examen);
+        editarExamenUI(examenCreado.examen);
+        mostrarPreguntasExamen(examenCreado.examen);
+
+        // Limpiar el formulario y cerrar el modal
+        document.getElementById("nombreExamen").value = "";
+        document.getElementById("fechaInicio").value = "";
+        document.getElementById("fechaFin").value = "";
+        document.getElementById("asignaturaExamen").value = "";
+        document.getElementById("preguntasExamen").innerHTML = "";
+
+        const crearExamenModal = bootstrap.Modal.getInstance(document.getElementById("crearExamenModal"));
+        if (crearExamenModal) {
+            crearExamenModal.hide();
+        }
+
+        console.log("Examen agregado a la tabla.");
+    } catch (error) {
+        console.error("Error al guardar el examen:", error);
+    }
+});
     }
 
     async function activeOrDesableExamenUI(id, estado, examen) {
@@ -644,84 +658,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-// async function activeOrDesableExamenUI(id, estado, examen) {
-//     console.log("id", id);
-//     console.log("examen", examen);
-//     console.log("estado", estado);
-
-//     const confirmarActiveOrDesable = document.getElementById(`confirmarActiveOrDesable${id}`);
-
-//     if (confirmarActiveOrDesable) {
-//         confirmarActiveOrDesable.addEventListener('click', async () => {
-//             try {
-//                 // Llamar al backend para activar o desactivar el examen
-//                 const response = await activeOrDesableExamen(id);
-
-//                 // Actualizar el objeto examen con los datos devueltos por el backend
-//                 examen.active = response.examen.active;
-
-//                 const tabla = $('#Examenes').DataTable();
-//                 const row = tabla.row(`[data-id="${id}"]`);
-
-//                 if (!row.node()) {
-//                     console.error(`No se encontró la fila con id: ${id}`);
-//                     return;
-//                 }
-
-//                 const rowData = row.data();
-//                 if (!rowData || rowData.length < 5) {
-//                     console.error(`Los datos de la fila son inválidos:`, rowData);
-//                     return;
-//                 }
-
-//                 if (examen.active === 1) {
-//                     // Si el examen está activo, actualizar la fila con los botones correspondientes
-//                     row.data([
-//                         rowData[0],
-//                         rowData[1],
-//                         rowData[2],
-//                         rowData[3],
-//                         `
-//                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal${id}"><i class="fas fa-edit"></i> Desactivar examen</button>
-//                         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
-//                         `
-//                     ]).draw(false);
-
-//                     // Reasignar eventos a los botones de la fila actualizada
-//                     document.body.insertAdjacentHTML('beforeend', deleteExamen(examen));
-//                     activeOrDesableExamenUI(id, 'disable', examen);
-//                 } else {
-//                     // Si el examen está desactivado, actualizar la fila con los botones correspondientes
-//                     row.data([
-//                         rowData[0],
-//                         rowData[1],
-//                         rowData[2],
-//                         rowData[3],
-//                         `
-//                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editarExamenModal${id}"><i class="fas fa-edit"></i> Editar examen</button>
-//                         <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#activeModal${id}"><i class="fas fa-edit"></i> Activar examen</button>
-//                         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${id}">Ver preguntas</button>
-//                         `
-//                     ]).draw(false);
-
-//                     // Reasignar eventos a los botones de la fila actualizada
-//                     document.body.insertAdjacentHTML('beforeend', activeExamen(examen));
-//                     activeOrDesableExamenUI(id, 'active', examen);
-//                 }
-
-//                 // Cerrar el modal después de confirmar
-//                 const modalElement = document.getElementById(estado === 'active' ? `activeModal${id}` : `deleteModal${id}`);
-//                 const modal = bootstrap.Modal.getInstance(modalElement);
-//                 if (modal) {
-//                     modal.hide();
-//                 }
-//             } catch (error) {
-//                 console.error('Error al confirmar la activación/desactivación:', error);
-//             }
-//         });
-//     }
-// }
-
     function editarExamenUI(examen) {
         const modalHtml = editarExamenModal(examen);
         document.body.insertAdjacentHTML("beforeend", modalHtml);
@@ -802,6 +738,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
     }
+
+
     await crearExamen()
     await rellenarExamenes()
 })
