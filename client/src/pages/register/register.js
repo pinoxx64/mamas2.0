@@ -95,7 +95,7 @@ const registrarse = async () => {
 
             try {
                 await register(user);
-                window.location.href = '../login/login.html';
+                window.location.href = '../activarRegister/activarRegister.html';
                 form.reset();
             } catch (error) {
                 console.error('Error al registrar:', error.message);
