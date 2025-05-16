@@ -18,7 +18,8 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:5',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'code' => 'required|numeric'
         ];
         $messages = [
             'unique' => 'El :attribute ya está registrado.',
@@ -49,7 +50,8 @@ class AuthController extends Controller
             // correo
             $datos = [
                 'userName' => $user->name,
-                'email' => $user->email
+                'email' => $user->email,
+                'code' => $input['code']
             ];
 
             $email = $user->email;
@@ -63,6 +65,7 @@ class AuthController extends Controller
             return response()->json([
                 "success" => true,
                 "data" => [
+                    'user' => $user,
                     'token' => $user->remember_token,
                     'name' => $user->name,
                     'id' => $user->id,

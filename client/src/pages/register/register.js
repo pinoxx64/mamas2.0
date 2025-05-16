@@ -87,14 +87,20 @@ const registrarse = async () => {
 
         if (!submitError && form.checkValidity()) {
             const formData = new FormData(form);
+            const code = Math.floor(Math.random() * (999999 - 100000) + 100000)
             const user = {
                 name: formData.get('name'),
                 email: formData.get('email'),
                 password: formData.get('password'),
+                code: code
             };
 
             try {
+                console.log(user)
                 await register(user);
+                console.log(formData.get('email'))
+                sessionStorage.setItem("code", code)
+                sessionStorage.setItem("email", formData.get('email'))
                 window.location.href = '../activarRegister/activarRegister.html';
                 form.reset();
             } catch (error) {

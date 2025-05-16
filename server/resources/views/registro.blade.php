@@ -11,10 +11,7 @@
         <p>Hola <strong>{{ $userName }}</strong>,</p>
         <p>Se ha creado una cuenta en nuestra plataforma usando tu correo electrónico: <strong>{{ $email }}</strong>.</p>
         <p>Para activar la cuenta deberas activarlo en el siguiente boton</p>
-        <p>
-            <button style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">
-                <a href="http://localhost:5173/src/pages/activarRegister/activarRegister.html" style="color: white; text-decoration: none;">Activar Cuenta</a>
-        </p>
+        <p>Tu codigo es: <strong>{{ $code }}</strong></p>
         <p>Gracias por unirte a <strong>Mamas Oficial</strong>.</p>
         <hr>
         <p style="text-align: center; font-size: 0.9em; color: #777;">
