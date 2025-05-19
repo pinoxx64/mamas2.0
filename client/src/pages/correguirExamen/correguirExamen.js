@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     examDropdown.addEventListener("change", async (e) => {
         const examenId = e.target.value;
 
-        // Limpiar el contenedor de usuarios
         userContainer.innerHTML = "";
 
         if (!examenId) return;
@@ -97,7 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     userContainer.appendChild(userRow);
 
-                    // Insertar modales dinámicamente
                     document.body.insertAdjacentHTML(
                         "beforeend",
                         corregirExamenModal(usuario, examenSeleccionado.nombre, examenSeleccionado.examenId)
@@ -193,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const payload = {
                     examenId,
                     usuarioId,
-                    resultados: correcciones, // Solo se envían los resultados
+                    resultados: correcciones,
                 };
 
                 console.log("Payload enviado a calcularNotaYGuardar:", payload);

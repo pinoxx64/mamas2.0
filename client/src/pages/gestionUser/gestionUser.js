@@ -1,9 +1,7 @@
 import { getUsersWithUserRol, putUser } from "../../components/userApi.js"
 import { deleteUserRol, getUserRolByUserId, postUserRol } from "../../components/userRolApi.js"
-//import { verificarToken } from "../../components/verificarToken.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-    //verificarToken()
 
     async function rellenarUsers() {
         const userWithUserRols = await getUsersWithUserRol();

@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         asignaturaSelect.appendChild(option)
     })
 
-    // Mostrar/ocultar campos según el tipo de pregunta
     const tipoPreguntaSelect = document.getElementById("tipoPregunta")
     const opcionesContainer = document.getElementById("opcionesContainer")
     const respuestaContainer = document.getElementById("respuesta").parentElement
@@ -30,22 +29,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     })
 
-    // const agregarOpcionBtn = document.getElementById("agregarOpcion")
-    // const opcionesCampos = document.getElementById("opcionesCampos")
-    // agregarOpcionBtn.addEventListener("click", function () {
-    //     const opcionDiv = document.createElement("div")
-    //     opcionDiv.classList.add("input-group", "mb-2")
-    //     opcionDiv.innerHTML = `
-    //         <input type="checkbox" class="form-check-input ms-2" title="Seleccionar como respuesta">
-    //         <input type="text" class="form-control" placeholder="Escribe una opción">
-    //         <button type="button" class="btn btn-danger btn-sm eliminar-opcion">Eliminar</button>
-    //     `
-    //     opcionesCampos.appendChild(opcionDiv)
-    //     opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
-    //         opcionDiv.remove()
-    //     })
-    // })
-
     const agregarOpcionBtn = document.getElementById("agregarOpcion");
     const opcionesCampos = document.getElementById("opcionesCampos");
 
@@ -53,9 +36,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         const opcionDiv = document.createElement("div");
         opcionDiv.classList.add("input-group", "mb-2");
 
-        // Contar las opciones existentes para determinar el prefijo (a., b., c., etc.)
         const totalOpciones = opcionesCampos.querySelectorAll(".input-group").length;
-        const prefijo = String.fromCharCode(97 + totalOpciones) + "."; // Genera 'a.', 'b.', 'c.', etc.
+        const prefijo = String.fromCharCode(97 + totalOpciones) + ".";
 
         opcionDiv.innerHTML = `
         <span class="input-group-text">${prefijo}</span>
@@ -65,20 +47,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     `;
         opcionesCampos.appendChild(opcionDiv);
 
-        // Agregar evento para eliminar la opción
         opcionDiv.querySelector(".eliminar-opcion").addEventListener("click", function () {
             opcionDiv.remove();
 
-            // Actualizar los prefijos después de eliminar una opción
             actualizarPrefijos();
         });
     });
 
-    // Función para actualizar los prefijos de las opciones
     function actualizarPrefijos() {
         const opciones = opcionesCampos.querySelectorAll(".input-group");
         opciones.forEach((opcionDiv, index) => {
-            const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+            const prefijo = String.fromCharCode(97 + index) + "."; 
             const span = opcionDiv.querySelector(".input-group-text");
             if (span) {
                 span.textContent = prefijo;
@@ -90,74 +69,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function crearPreguntaUI() {
         const guardarPreguntaBtn = document.getElementById("guardarPregunta")
-
-        // guardarPreguntaBtn.addEventListener("click", async () => {
-        //     try {
-        //         const tipo = tipoPreguntaSelect.value;
-        //         const pregunta = document.getElementById("pregunta").value;
-        //         const asignaturaId = asignaturaSelect.value;
-
-        //         let opciones = [];
-        //         let respuesta = null;
-        //         let tipoPregunta = tipo;
-
-        //         if (tipo === "opciones") {
-        //             const opcionesInputs = opcionesCampos.querySelectorAll(".input-group");
-        //             opciones = Array.from(opcionesInputs).map((opcionDiv, index) => {
-        //                 const texto = opcionDiv.querySelector("input[type='text']").value;
-        //                 const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
-        //                 const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
-        //                 return { texto: `${prefijo} ${texto}`, seleccionado };
-        //             });
-
-        //             const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
-        //             if (opcionesSeleccionadas.length === 1) {
-        //                 respuesta = opcionesSeleccionadas[0].texto; // Guardar la respuesta con el prefijo
-        //                 opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
-        //                 tipoPregunta = "opciones individuales";
-        //             } else if (opcionesSeleccionadas.length > 1) {
-        //                 respuesta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", "); // Respuestas múltiples con prefijos
-        //                 opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
-        //                 tipoPregunta = "opciones multiples";
-        //             }
-        //         } else {
-        //             respuesta = document.getElementById("respuesta").value;
-        //         }
-
-        //         const nuevaPregunta = {
-        //             tipo: tipoPregunta,
-        //             pregunta: pregunta,
-        //             asignaturaId: asignaturaId,
-        //             opciones: opciones.length > 0 ? opciones.join("\n") : null, // Guardar opciones separadas por saltos de línea
-        //         };
-
-        //         console.log("Nueva Pregunta:", nuevaPregunta);
-        //         const preguntaCreada = await postPregunta(nuevaPregunta);
-
-        //         if (tipoPregunta === "opciones individuales" || tipoPregunta === "opciones multiples") {
-        //             const respuestas = respuesta.split(", ");
-        //             respuestas.forEach(async (res) => {
-        //                 const nuevaRespuesta = {
-        //                     respuesta: res.trim(),
-        //                     preguntaId: preguntaCreada.pregunta.id,
-        //                 };
-        //                 console.log("Nueva Respuesta:", nuevaRespuesta);
-        //                 await postRespuesta(nuevaRespuesta);
-        //             });
-        //         } else {
-        //             const nuevaRespuesta = {
-        //                 respuesta: respuesta,
-        //                 preguntaId: preguntaCreada.pregunta.id,
-        //             };
-        //             console.log("Nueva Respuesta:", nuevaRespuesta);
-        //             await postRespuesta(nuevaRespuesta);
-        //         }
-
-        //         location.reload();
-        //     } catch (error) {
-        //         console.error("Error al crear la pregunta:", error);
-        //     }
-        // });
 
         guardarPreguntaBtn.addEventListener("click", async () => {
             try {
@@ -174,18 +85,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                     opciones = Array.from(opcionesInputs).map((opcionDiv, index) => {
                         const texto = opcionDiv.querySelector("input[type='text']").value;
                         const seleccionado = opcionDiv.querySelector("input[type='checkbox']").checked;
-                        const prefijo = String.fromCharCode(97 + index) + "."; // Genera 'a.', 'b.', 'c.', etc.
+                        const prefijo = String.fromCharCode(97 + index) + ".";
                         return { texto: `${prefijo} ${texto}`, seleccionado };
                     });
 
                     const opcionesSeleccionadas = opciones.filter(opcion => opcion.seleccionado);
                     if (opcionesSeleccionadas.length === 1) {
-                        respuesta = opcionesSeleccionadas[0].texto; // Guardar la respuesta con el prefijo
-                        opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+                        respuesta = opcionesSeleccionadas[0].texto;
+                        opciones = opciones.map(opcion => opcion.texto);
                         tipoPregunta = "opciones individuales";
                     } else if (opcionesSeleccionadas.length > 1) {
-                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", "); // Respuestas múltiples con prefijos
-                        opciones = opciones.map(opcion => opcion.texto); // Guardar todas las opciones con prefijos
+                        respuesta = opcionesSeleccionadas.map(opcion => opcion.texto).join(", ");
+                        opciones = opciones.map(opcion => opcion.texto);
                         tipoPregunta = "opciones multiples";
                     }
                 } else {
@@ -221,7 +132,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     await postRespuesta(nuevaRespuesta);
                 }
 
-                // Agregar la nueva pregunta a la tabla sin recargar la página
                 const tabla = $('#Preguntas').DataTable();
                 const asignaturaNombre = asignaturas.asignatura.find(asignatura => asignatura.id == asignaturaId)?.nombre || 'Sin asignatura';
                 const opcionesTexto = opciones.length > 0 ? opciones.join(", ") : 'No tiene opciones';
