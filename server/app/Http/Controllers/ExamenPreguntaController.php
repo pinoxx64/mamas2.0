@@ -29,13 +29,6 @@ class ExamenPreguntaController extends Controller
 
     public function getExamenPreguntaByExamenId($id)
     {
-        // $examenPregunta = ExamenPregunta::with('respuestas')->where('examenId', $id)->get();
-
-        // if ($examenPregunta->isEmpty()) {
-        //     return response()->json(['message' => 'examenPregunta don`t find'], 404);
-        // }
-
-        // return response()->json(['examenPregunta' => $examenPregunta]);
         $examenPregunta = ExamenPregunta::with(['respuestas', 'respuestaExamen'])->where('examenId', $id)->get();
 
         if ($examenPregunta->isEmpty()) {
