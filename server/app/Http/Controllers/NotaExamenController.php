@@ -183,15 +183,28 @@ class NotaExamenController extends Controller
             $correcta = false;
 
             if ($pregunta) {
+                $tipoPregunta = $pregunta->pregunta->tipo ?? null;
                 $respuestasCorrectas = $pregunta->pregunta->respuestas->pluck('respuesta')->map(function ($respuesta) {
                     return trim(strtolower($respuesta));
                 })->toArray();
 
                 $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
-                if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
-                    $nota += $pregunta->puntuacion;
-                    $correcta = true;
+                if ($tipoPregunta === 'texto') {
+                    foreach ($respuestasUsuario as $respUser) {
+                        foreach ($respuestasCorrectas as $respCorrecta) {
+                            if (strpos($respCorrecta, $respUser) !== false && $respUser !== '') {
+                                $nota += $pregunta->puntuacion;
+                                $correcta = true;
+                                break 2;
+                            }
+                        }
+                    }
+                } else {
+                    if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
+                        $nota += $pregunta->puntuacion;
+                        $correcta = true;
+                    }
                 }
 
                 $correcciones[] = [
@@ -263,15 +276,28 @@ class NotaExamenController extends Controller
                 $correcta = false;
 
                 if ($pregunta) {
+                    $tipoPregunta = $pregunta->pregunta->tipo ?? null;
                     $respuestasCorrectas = $pregunta->pregunta->respuestas->map(function ($respuesta) {
                         return trim(strtolower($respuesta->respuesta));
                     })->toArray();
 
-                    $respuestasUsuario = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
+                    $respuestasUsuarioArr = array_map('trim', explode(',', strtolower($respuestaUsuario->respuesta)));
 
-                    if (!array_diff($respuestasUsuario, $respuestasCorrectas)) {
-                        $nota += $pregunta->puntuacion;
-                        $correcta = true;
+                    if ($tipoPregunta === 'texto') {
+                        foreach ($respuestasUsuarioArr as $respUser) {
+                            foreach ($respuestasCorrectas as $respCorrecta) {
+                                if (strpos($respCorrecta, $respUser) !== false && $respUser !== '') {
+                                    $nota += $pregunta->puntuacion;
+                                    $correcta = true;
+                                    break 2;
+                                }
+                            }
+                        }
+                    } else {
+                        if (!array_diff($respuestasUsuarioArr, $respuestasCorrectas)) {
+                            $nota += $pregunta->puntuacion;
+                            $correcta = true;
+                        }
                     }
 
                     $correcciones[] = [
