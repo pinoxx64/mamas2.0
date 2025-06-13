@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./register.css">
+</head>
+
+<body>
+  <div class="form-container">
+    <div class="form-card">
+      <h2>Registro</h2>
+      <p>Crea una cuenta para unirte</p>
+      <form class="form" id="register-form">
+        <input type="text" id="name" name="name" placeholder="Nombre completo" required>
+        <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+        <input type="password" id="password" name="password" placeholder="Contraseña" required>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" required>
+        <button type="submit" class="btn">Registrarse</button>
+        <p class="form-footer">¿Ya tienes una cuenta? <a href="../login/login.html">Inicia sesión</a></p>
+      </form>
+    </div>
+  </div>
+  <script type="module" src="./register.js"></script>
+</body>
+
+</html>

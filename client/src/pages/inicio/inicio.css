@@ -1,0 +1,85 @@
+body {
+    background: url('./../../assets/backgroundEscape.webp') no-repeat center center fixed;
+    background-color: black;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: white;
+}   
+
+#wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#header-container {
+    background: #23272a;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 1em;
+    margin: 1em;
+}
+
+h1 {
+    font-size: 2em;
+    color: #e2e2e2;
+    margin: 0;
+}
+
+.main-content {
+    background: #23272a;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 2em;
+    margin: 1em;
+    width: 100%;
+    max-width: 400px;
+}
+
+main .btn-primary {
+    background: #ff5555;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+main .btn-primary:hover {
+    background: #7289da;
+}
+
+.score {
+    color: #e2e2e2;
+    font-size: 1.2em;
+}
+
+a {
+    color: #f1c40f;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #f39c12;
+    text-decoration: underline;
+}
+
+.modal-content.text-black {
+    color: black;
+}
+
+main h1 {
+    font-size: 3rem;
+    color: #e2e2e2;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+main p {
+    font-size: 1.2rem;
+    color: #e2e2e2;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
